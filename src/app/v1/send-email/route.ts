@@ -3,17 +3,28 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function POST() {
+const sendMail = async (emailData: any) => {
+  const { from, to, subject, firstName, product } = emailData;
+  const contacts = JSON.parse(to.replace(/'/g, '"'));
+
   try {
-    const data = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      to: ["brytebee@gmail.com"],
-      subject: "Testa",
-      react: EmailTemplate({ firstName: "Bright" }),
+    const res = await resend.emails.send({
+      from: `${product} <${from}>`,
+      to: contacts,
+      subject,
+      react: EmailTemplate({
+        firstName,
+        product,
+      }),
     });
 
-    return Response.json(data);
+    return Response.json({ message: "success", res });
   } catch (error) {
-    return Response.json({ error });
+    return Response.json({ message: "failed", error });
   }
+};
+
+export async function POST(req: any) {
+  const data = await req.json();
+  return await sendMail(data);
 }
