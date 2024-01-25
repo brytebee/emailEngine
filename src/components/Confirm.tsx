@@ -10,8 +10,6 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
-// import Logo from "../../public/svg/techverse-logo.svg";
-import Logo from "./techverse-logo.png";
 
 interface Props {
   code?: string;
@@ -19,21 +17,18 @@ interface Props {
   product?: string;
 }
 
-export const ConfirmEmail = ({
-  code = "144800",
-  firstName = "John",
-  product = "TVA",
-}: Props) => (
+export const ConfirmEmail = ({ code, firstName, product }: Props) => (
   <Html>
     <Head />
     <Body style={main}>
       <Container style={container}>
         <Img
-          // src={`${baseUrl}/static/plaid-logo.png`}
-          src={`${Logo}`}
-          width="212"
-          height="88"
-          alt="Techverse Academy"
+          src={
+            "https://res.cloudinary.com/bizkollekt/image/upload/v1699220505/Business%20Images/abkj1m6ywpoojfxktg1h.png"
+          }
+          width="200"
+          height="48"
+          alt="Plaid"
           style={logo}
         />
         <Text style={greeting}>Hi, {firstName}</Text>
@@ -63,6 +58,7 @@ export default ConfirmEmail;
 const main = {
   backgroundColor: "#ffffff",
   fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
+  marginTop: "30px",
 };
 
 const container = {
@@ -73,7 +69,7 @@ const container = {
   marginTop: "20px",
   maxWidth: "360px",
   margin: "0 auto",
-  padding: "68px 0 130px",
+  padding: "36px 0 98px",
 };
 
 const logo = {
@@ -86,7 +82,7 @@ const greeting = {
   fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
   letterSpacing: "0",
   lineHeight: "23px",
-  padding: "0 40px",
+  padding: "12px 40px",
   margin: "0",
   textAlign: "left" as const,
 };
@@ -108,7 +104,7 @@ const secondary = {
   color: "#000",
   display: "inline-block",
   fontFamily: "HelveticaNeue-Medium,Helvetica,Arial,sans-serif",
-  fontSize: "20px",
+  fontSize: "18px",
   fontWeight: 500,
   lineHeight: "24px",
   marginBottom: "0",
