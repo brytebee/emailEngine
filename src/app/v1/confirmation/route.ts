@@ -5,12 +5,17 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendMail = async (emailData: any) => {
   const { from, to, subject, firstName, product, code } = emailData;
-  const contacts = JSON.parse(to.replace(/'/g, '"'));
+  let contacts: string | null;
+  // For collection of emails eg ['a@a.com', 'b@b.com', ...]
+  if (to.length > 1 && to.includes("'")) {
+    contacts = JSON.parse(to.replace(/'/g, '"'));
+  }
 
   try {
     const res = await resend.emails.send({
       from: `${product} <${from}>`,
-      to: contacts,
+      // @ts-ignore
+      to: contacts ?? to,
       subject,
       react: ConfirmEmail({
         code,
