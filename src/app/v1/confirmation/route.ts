@@ -1,4 +1,5 @@
 import ConfirmEmail from "@/components/Confirm";
+import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -24,9 +25,9 @@ const sendMail = async (emailData: any) => {
       }),
     });
 
-    return Response.json({ message: "success", res });
+    return NextResponse.json({ message: "success", res });
   } catch (error) {
-    return Response.json({ message: "failed", error });
+    return NextResponse.json({ message: "failed", error });
   }
 };
 
