@@ -46,8 +46,8 @@ export const Recova = ({ link, firstName, product, domain }: Props) => (
             Reset Password
           </Button>
           <Text style={paragraph}>
-            2. If the link doesn't work, copy and paste the following URL into
-            your browser:
+            2. If the link doesn&apos;t work, copy and paste the following URL
+            into your browser:
           </Text>
           <Text style={linka}>{link}</Text>
           <Hr style={hr} />
@@ -57,8 +57,8 @@ export const Recova = ({ link, firstName, product, domain }: Props) => (
           </Text>
           <Text style={paragraph}>
             For security reasons, this link will expire in 24 hours. If you need
-            further assistance, please don't hesitate to contact our support
-            team at:
+            further assistance, please don&apos;t hesitate to contact our
+            support team at:
           </Text>
           <Text style={sup}>{`https://www.${domain}/help`}</Text>
           <Text style={paragraph}>— The {product} team</Text>
