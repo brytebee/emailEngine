@@ -77,11 +77,11 @@ export const UrlVerifyTech = ({
           </Text>
 
           <Section style={codeBlock}>
-            <Text style={codeComment}>// Reset your password securely</Text>
+            <Text style={codeComment}> == // Reset your password securely</Text>
             <Link href={resetUrl} style={resetButton}>
               RESET PASSWORD
             </Link>
-            <Text style={codeComment}>// Token expires in 24 hours</Text>
+            <Text style={codeComment}> == // Token expires in 24 hours</Text>
           </Section>
 
           <Section style={tokenSection}>

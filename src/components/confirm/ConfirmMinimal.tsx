@@ -48,8 +48,9 @@ export const MinimalConfirmEmail = ({
           <Heading style={secondary}>Verify Your Email</Heading>
 
           <Text style={paragraph}>
-            You're just one step away from completing your registration. Please
-            use the verification code below to confirm your email address.
+            You&apos;re just one step away from completing your registration.
+            Please use the verification code below to confirm your email
+            address.
           </Text>
 
           <Section style={codeContainer}>

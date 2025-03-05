@@ -48,7 +48,7 @@ export const UrlVerifyCreative = ({
         <Section style={heroSection}>
           <Heading style={heroHeading}>Reset Your Password</Heading>
           <Text style={heroText}>
-            Let's get you back in action, {firstName}!
+            Let&apos;s get you back in action, {firstName}!
           </Text>
         </Section>
         <Section style={contentSection}>
@@ -78,7 +78,8 @@ export const UrlVerifyCreative = ({
           </Section>
           <Section style={divider}></Section>
           <Text style={noteText}>
-            If you didn't request this reset, you can safely ignore this email
+            If you didn&apos;t request this reset, you can safely ignore this
+            email
             {support && (
               <>
                 {" "}

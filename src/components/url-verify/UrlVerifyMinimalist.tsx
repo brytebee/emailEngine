@@ -55,7 +55,7 @@ export const UrlVerifyMinimalist = ({
             </Link>
           </Section>
           <Text style={tokenWrapper}>
-            If the button doesn't work, use this token:
+            If the button doesn&apos;t work, use this token:
             <Section style={tokenContainer}>
               <Text style={tokenStyle}>{resetToken}</Text>
             </Section>
@@ -64,7 +64,7 @@ export const UrlVerifyMinimalist = ({
           <Text style={footerText}>
             {support ? (
               <>
-                If you didn't request this change, please contact us at{" "}
+                If you didn&apos;t request this change, please contact us at{" "}
                 <Link href={`mailto:${support}`} style={link}>
                   {support}
                 </Link>

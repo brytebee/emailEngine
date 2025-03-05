@@ -47,8 +47,8 @@ export const TechConfirmEmail = ({
           <Heading style={title}>Verification Code</Heading>
           <Text style={subtitle}>Hey {firstName}! 👋</Text>
           <Text style={paragraph}>
-            You're almost there! Enter this verification code in the browser
-            window where you started creating your {product} account:
+            You&apos;re almost there! Enter this verification code in the
+            browser window where you started creating your {product} account:
           </Text>
           <Section style={codeContainer}>
             <Text style={codeStyle}>{code}</Text>
