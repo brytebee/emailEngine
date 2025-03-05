@@ -1,10 +1,10 @@
-// // app/v1/confirmation/route.ts
+// // app/v1/url-verify/route.ts
 
-// import ConfirmEmail from "@/components/confirm/Confirm";
-// import CorporateConfirmEmail from "@/components/confirm/ConfirmCorporate";
-// import ElegantConfirmEmail from "@/components/confirm/ConfirmElegant";
-// import MinimalConfirmEmail from "@/components/confirm/ConfirmMinimal";
-// import TechConfirmEmail from "@/components/confirm/ConfirmTech";
+// import UrlVerifyEmail from "@/components/url-verify/UrlVerify";
+// import UrlVerifyCorporate from "@/components/url-verify/UrlVerifyCorporate";
+// import UrlVerifyCreative from "@/components/url-verify/UrlVerifyCreative";
+// import UrlVerifyMinimalist from "@/components/url-verify/UrlVerifyMinimalist";
+// import UrlVerifyTech from "@/components/url-verify/UrlVerifyTech";
 // import { NextResponse } from "next/server";
 // import { Resend } from "resend";
 
@@ -19,7 +19,16 @@
 //     });
 //   }
 
-//   const { from, to, subject, firstName, product, code, logoUrl } = emailData; // Added imageUrl parameter
+//   const {
+//     from,
+//     to,
+//     subject,
+//     firstName,
+//     product,
+//     resetToken,
+//     resetUrl,
+//     logoUrl,
+//   } = emailData;
 //   const stripDomain = from.split("@")[1];
 //   let API_KEY: string | undefined;
 //   const domainList = [d1, d2];
@@ -53,11 +62,12 @@
 //       // @ts-ignore
 //       to: contacts ?? to,
 //       subject,
-//       react: ConfirmEmail({
-//         code,
+//       react: UrlVerifyEmail({
+//         resetToken,
+//         resetUrl,
 //         firstName,
 //         product,
-//         logoUrl, // Pass the imageUrl to the ConfirmEmail component
+//         logoUrl,
 //       }),
 //     });
 
@@ -72,18 +82,23 @@
 //   return await sendMail(data);
 // }
 
-import ConfirmEmail from "@/components/confirm/Confirm";
-import CorporateConfirmEmail from "@/components/confirm/ConfirmCorporate";
-import ElegantConfirmEmail from "@/components/confirm/ConfirmElegant";
-import MinimalConfirmEmail from "@/components/confirm/ConfirmMinimal";
-import TechConfirmEmail from "@/components/confirm/ConfirmTech";
+import UrlVerifyEmail from "@/components/url-verify/UrlVerify";
+import UrlVerifyCorporate from "@/components/url-verify/UrlVerifyCorporate";
+import UrlVerifyCreative from "@/components/url-verify/UrlVerifyCreative";
+import UrlVerifyMinimalist from "@/components/url-verify/UrlVerifyMinimalist";
+import UrlVerifyTech from "@/components/url-verify/UrlVerifyTech";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const { d1, d2, RESEND_API_KEY_TVA, RESEND_API_KEY_JHT } = process.env;
 
 // Define a type for email templates
-type EmailTemplate = "default" | "corporate" | "elegant" | "minimal" | "tech";
+type EmailTemplate =
+  | "default"
+  | "corporate"
+  | "creative"
+  | "minimalist"
+  | "tech";
 
 const sendMail = async (emailData: any) => {
   if ((!d1 || !d2) && (!RESEND_API_KEY_JHT || !RESEND_API_KEY_TVA)) {
@@ -100,7 +115,8 @@ const sendMail = async (emailData: any) => {
     subject,
     firstName,
     product,
-    code,
+    resetToken,
+    resetUrl,
     logoUrl,
     template = "default", // Default to 'default' if not specified
   } = emailData;
@@ -134,15 +150,15 @@ const sendMail = async (emailData: any) => {
 
   // Select the email template based on the template parameter
   const templateComponents = {
-    default: ConfirmEmail,
-    corporate: CorporateConfirmEmail,
-    elegant: ElegantConfirmEmail,
-    minimal: MinimalConfirmEmail,
-    tech: TechConfirmEmail,
+    default: UrlVerifyEmail,
+    corporate: UrlVerifyCorporate,
+    creative: UrlVerifyCreative,
+    minimalist: UrlVerifyMinimalist,
+    tech: UrlVerifyTech,
   };
 
   const EmailTemplateComponent =
-    templateComponents[template as EmailTemplate] || ConfirmEmail;
+    templateComponents[template as EmailTemplate] || UrlVerifyEmail;
 
   try {
     const res = await resend.emails.send({
@@ -151,7 +167,8 @@ const sendMail = async (emailData: any) => {
       to: contacts ?? to,
       subject,
       react: EmailTemplateComponent({
-        code,
+        resetToken,
+        resetUrl,
         firstName,
         product,
         logoUrl,
