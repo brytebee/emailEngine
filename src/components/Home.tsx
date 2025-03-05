@@ -212,71 +212,6 @@ export default function Home() {
     </motion.div>
   );
 
-  // Render the selected template in detail view
-  // const DetailViewModal = () => {
-  //   if (!selectedTemplate) return null;
-
-  //   const TemplateComponent = selectedTemplate.component;
-
-  //   return (
-  //     <AnimatePresence>
-  //       <motion.div
-  //         initial={{ opacity: 0 }}
-  //         animate={{ opacity: 1 }}
-  //         exit={{ opacity: 0 }}
-  //         className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 overflow-y-auto"
-  //         onClick={closeDetailView}
-  //       >
-  //         <motion.div
-  //           initial={{ scale: 0.9, y: 20 }}
-  //           animate={{ scale: 1, y: 0 }}
-  //           exit={{ scale: 0.9, opacity: 0 }}
-  //           transition={{ type: "spring", damping: 15, stiffness: 300 }}
-  //           className="bg-white dark:bg-neutral-900 rounded-xl w-full max-w-3xl mx-auto my-12 relative shadow-2xl"
-  //           onClick={(e) => e.stopPropagation()}
-  //         >
-  //           <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b bg-white dark:bg-neutral-900 rounded-t-xl">
-  //             <Button
-  //               variant="ghost"
-  //               size="default"
-  //               onClick={closeDetailView}
-  //               className="gap-2 text-primary"
-  //             >
-  //               <ArrowLeft size={16} />
-  //               Back to Gallery
-  //             </Button>
-
-  //             <Button
-  //               variant="ghost"
-  //               size="icon"
-  //               onClick={closeDetailView}
-  //               className="rounded-full"
-  //             >
-  //               <X size={18} />
-  //             </Button>
-  //           </div>
-
-  //           <div className="p-8">
-  //             <h2 className="text-2xl font-bold mb-6">
-  //               {selectedTemplate.title}
-  //             </h2>
-  //             <div className="border rounded-lg p-6 mb-6 bg-slate-50 dark:bg-neutral-800">
-  //               <TemplateComponent {...sampleData} />
-  //             </div>
-  //             <div className="flex flex-wrap gap-2 mb-6">
-  //               {selectedTemplate.tags.map((tag: any) => (
-  //                 <Badge key={tag} variant="outline" className="text-xs">
-  //                   {tag}
-  //                 </Badge>
-  //               ))}
-  //             </div>
-  //           </div>
-  //         </motion.div>
-  //       </motion.div>
-  //     </AnimatePresence>
-  //   );
-  // };
-
   const DetailViewModal = ({
     template,
     onClose,
@@ -300,16 +235,16 @@ export default function Home() {
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 15, stiffness: 300 }}
-            className="bg-white dark:bg-neutral-900 rounded-xl relative shadow-2xl"
+            className="bg-white dark:bg-neutral-900 rounded-xl relative shadow-2xl max-w-4xl w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header with Back and Close Buttons */}
-            <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between">
+            <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm border-b border-slate-200/50 dark:border-slate-800/50 rounded-t-xl">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={closeDetailView}
-                className="gap-2 bg-white/80 backdrop-blur-sm dark:bg-neutral-800/80"
+                onClick={onClose}
+                className="gap-2"
               >
                 <ArrowLeft size={16} />
                 Back to Gallery
@@ -318,22 +253,20 @@ export default function Home() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={closeDetailView}
-                className="rounded-full bg-white/80 backdrop-blur-sm dark:bg-neutral-800/80"
+                onClick={onClose}
+                className="rounded-full"
               >
                 <X size={18} />
               </Button>
             </div>
 
-            <div className="p-8 pt-20">
-              <h2 className="text-2xl font-bold mb-6">
-                {selectedTemplate.title}
-              </h2>
+            <div className="p-8">
+              <h2 className="text-2xl font-bold mb-6">{template.title}</h2>
               <div className="border rounded-lg p-6 mb-6 bg-slate-50 dark:bg-neutral-800">
                 <TemplateComponent {...sampleData} />
               </div>
               <div className="flex flex-wrap gap-2 mb-6">
-                {selectedTemplate.tags.map((tag: any) => (
+                {template.tags.map((tag: any) => (
                   <Badge key={tag} variant="outline" className="text-xs">
                     {tag}
                   </Badge>
@@ -345,71 +278,6 @@ export default function Home() {
       </AnimatePresence>
     );
   };
-
-  // const DetailViewModal = () => {
-  //   if (!selectedTemplate) return null;
-
-  //   const TemplateComponent = selectedTemplate.component;
-
-  //   return (
-  //     <AnimatePresence>
-  //       <motion.div
-  //         initial={{ opacity: 0 }}
-  //         animate={{ opacity: 1 }}
-  //         exit={{ opacity: 0 }}
-  //         className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 overflow-y-auto flex items-center justify-center p-4"
-  //         onClick={closeDetailView}
-  //       >
-  //         <motion.div
-  //           initial={{ scale: 0.9, y: 20 }}
-  //           animate={{ scale: 1, y: 0 }}
-  //           exit={{ scale: 0.9, opacity: 0 }}
-  //           transition={{ type: "spring", damping: 15, stiffness: 300 }}
-  //           className="bg-white dark:bg-neutral-900 rounded-xl w-full max-w-3xl relative shadow-2xl"
-  //           onClick={(e) => e.stopPropagation()}
-  //         >
-  //           {/* Header with Back and Close Buttons */}
-  //           <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between">
-  //             <Button
-  //               variant="outline"
-  //               size="sm"
-  //               onClick={closeDetailView}
-  //               className="gap-2 bg-white/80 backdrop-blur-sm dark:bg-neutral-800/80"
-  //             >
-  //               <ArrowLeft size={16} />
-  //               Back to Gallery
-  //             </Button>
-
-  //             <Button
-  //               variant="ghost"
-  //               size="icon"
-  //               onClick={closeDetailView}
-  //               className="rounded-full bg-white/80 backdrop-blur-sm dark:bg-neutral-800/80"
-  //             >
-  //               <X size={18} />
-  //             </Button>
-  //           </div>
-
-  //           <div className="p-8 pt-20">
-  //             <h2 className="text-2xl font-bold mb-6">
-  //               {selectedTemplate.title}
-  //             </h2>
-  //             <div className="border rounded-lg p-6 mb-6 bg-slate-50 dark:bg-neutral-800">
-  //               <TemplateComponent {...sampleData} />
-  //             </div>
-  //             <div className="flex flex-wrap gap-2 mb-6">
-  //               {selectedTemplate.tags.map((tag: any) => (
-  //                 <Badge key={tag} variant="outline" className="text-xs">
-  //                   {tag}
-  //                 </Badge>
-  //               ))}
-  //             </div>
-  //           </div>
-  //         </motion.div>
-  //       </motion.div>
-  //     </AnimatePresence>
-  //   );
-  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white dark:from-slate-950 dark:to-black">
@@ -530,9 +398,8 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Detail View Modal
-      {selectedTemplate && <DetailViewModal />} */}
       {/* Detail View Modal */}
+
       {selectedTemplate && (
         <DetailViewModal
           template={selectedTemplate}
