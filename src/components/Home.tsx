@@ -370,8 +370,7 @@ export default function Home() {
             </div>
 
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 md:mb-0">
-              © {new Date().getFullYear()} TechVerse Academy. All rights
-              reserved.
+              © {new Date().getFullYear()} GreenCode. All rights reserved.
             </p>
 
             <div className="flex space-x-6">
