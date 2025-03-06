@@ -39,7 +39,8 @@ const sampleData = {
   logoUrl:
     "https://res.cloudinary.com/dprkvmhld/image/upload/v1726589389/school-test-system_jxbfjt.jpg",
   verifyUrl:
-    "https://techverseacademy.com/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+    "https://emailtemplates.com/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+  support: "help@emailtemplates.com",
 };
 
 // Template data
@@ -353,7 +354,7 @@ export default function Home() {
             </div>
 
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 md:mb-0">
-              © {new Date().getFullYear()} GreenCode. All rights reserved.
+              © {new Date().getFullYear()} EmailTemplates. All rights reserved.
             </p>
 
             <div className="flex space-x-6">
