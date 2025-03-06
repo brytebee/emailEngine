@@ -28,26 +28,16 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "next-themes";
 
-// Import confirmation email templates
-import ConfirmEmail from "@/components/confirm/Confirm";
-import CorporateConfirmEmail from "@/components/confirm/ConfirmCorporate";
-import ElegantConfirmEmail from "@/components/confirm/ConfirmElegant";
-import MinimalConfirmEmail from "@/components/confirm/ConfirmMinimal";
-import TechConfirmEmail from "@/components/confirm/ConfirmTech";
-
-// Import URL verification email templates
-import UrlVerify from "@/components/url-verify/UrlVerify";
-import UrlVerifyCorporate from "@/components/url-verify/UrlVerifyCorporate";
-import UrlVerifyCreative from "@/components/url-verify/UrlVerifyCreative";
-import UrlVerifyMinimalist from "@/components/url-verify/UrlVerifyMinimalist";
-import UrlVerifyTech from "@/components/url-verify/UrlVerifyTech";
+// Import the browser-compatible email preview component
+import { EmailPreview } from "@/components/preview/EmailPreview";
 
 // Sample data for the templates
 const sampleData = {
   code: "423956",
   firstName: "Alex",
-  product: "TechVerse Academy",
-  imageUrl: "/images/techverse-logo.png",
+  product: "Email Services",
+  logoUrl:
+    "https://res.cloudinary.com/dprkvmhld/image/upload/v1726589389/school-test-system_jxbfjt.jpg",
   verifyUrl:
     "https://techverseacademy.com/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
 };
@@ -61,7 +51,6 @@ const confirmTemplates = [
     description:
       "Classic design with straightforward verification code display",
     imageSrc: "/templates/confirm-default.png",
-    component: ConfirmEmail,
     tags: ["Classic", "Simple"],
   },
   {
@@ -70,7 +59,6 @@ const confirmTemplates = [
     title: "Corporate Style",
     description: "Professional design suitable for business applications",
     imageSrc: "/templates/confirm-corporate.png",
-    component: CorporateConfirmEmail,
     tags: ["Professional", "Business"],
   },
   {
@@ -79,7 +67,6 @@ const confirmTemplates = [
     title: "Elegant Design",
     description: "Sophisticated layout with refined typography",
     imageSrc: "/templates/confirm-elegant.png",
-    component: ElegantConfirmEmail,
     tags: ["Sophisticated", "Premium"],
   },
   {
@@ -88,7 +75,6 @@ const confirmTemplates = [
     title: "Minimal Style",
     description: "Clean and simple design focusing on essential information",
     imageSrc: "/templates/confirm-minimal.png",
-    component: MinimalConfirmEmail,
     tags: ["Clean", "Minimal"],
   },
   {
@@ -97,7 +83,6 @@ const confirmTemplates = [
     title: "Tech Modern",
     description: "Contemporary design with vibrant colors for tech companies",
     imageSrc: "/templates/confirm-tech.png",
-    component: TechConfirmEmail,
     tags: ["Modern", "Vibrant"],
   },
 ];
@@ -109,7 +94,6 @@ const urlTemplates = [
     title: "Standard URL Verification",
     description: "Clean design with verification link",
     imageSrc: "/templates/url-default.png",
-    component: UrlVerify,
     tags: ["Standard", "Clean"],
   },
   {
@@ -118,7 +102,6 @@ const urlTemplates = [
     title: "Corporate URL Verify",
     description: "Professional design with branded elements",
     imageSrc: "/templates/url-corporate.png",
-    component: UrlVerifyCorporate,
     tags: ["Professional", "Branded"],
   },
   {
@@ -127,7 +110,6 @@ const urlTemplates = [
     title: "Creative URL Verify",
     description: "Eye-catching design with unique visual elements",
     imageSrc: "/templates/url-creative.png",
-    component: UrlVerifyCreative,
     tags: ["Creative", "Unique"],
   },
   {
@@ -136,7 +118,6 @@ const urlTemplates = [
     title: "Minimalist URL Verify",
     description: "Ultra-clean design focusing on the verification button",
     imageSrc: "/templates/url-minimalist.png",
-    component: UrlVerifyMinimalist,
     tags: ["Minimal", "Clean"],
   },
   {
@@ -145,7 +126,6 @@ const urlTemplates = [
     title: "Tech-Oriented Verify",
     description: "Modern design catered to technology companies",
     imageSrc: "/templates/url-tech.png",
-    component: UrlVerifyTech,
     tags: ["Modern", "Tech"],
   },
 ];
@@ -219,8 +199,6 @@ export default function Home() {
     template: any;
     onClose: () => void;
   }) => {
-    const TemplateComponent = template.component;
-
     return (
       <AnimatePresence>
         <motion.div
@@ -263,7 +241,12 @@ export default function Home() {
             <div className="p-8">
               <h2 className="text-2xl font-bold mb-6">{template.title}</h2>
               <div className="border rounded-lg p-6 mb-6 bg-slate-50 dark:bg-neutral-800">
-                <TemplateComponent {...sampleData} />
+                {/* Use the EmailPreview component here */}
+                <EmailPreview
+                  templateType={template.type}
+                  style={template.id}
+                  {...sampleData}
+                />
               </div>
               <div className="flex flex-wrap gap-2 mb-6">
                 {template.tags.map((tag: any) => (
@@ -398,7 +381,6 @@ export default function Home() {
       </footer>
 
       {/* Detail View Modal */}
-
       {selectedTemplate && (
         <DetailViewModal
           template={selectedTemplate}
