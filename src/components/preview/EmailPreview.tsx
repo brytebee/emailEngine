@@ -1,6 +1,7 @@
 // components/preview/EmailPreview.tsx
 import React from "react";
 import { getEmailLogoUrl } from "@/utils/imageUtils";
+import Image from "next/image";
 
 // This component will render a browser-compatible preview of the email templates
 interface EmailPreviewProps {
@@ -124,7 +125,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                   boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                 }}
               >
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="120"
                   height="120"
@@ -208,7 +209,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                   background: "linear-gradient(to bottom, #ffffff, #f9f9f9)",
                 }}
               >
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="100"
                   height="100"
@@ -371,7 +372,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                     marginTop: "-36px",
                   }}
                 ></div>
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="80"
                   height="80"
@@ -451,7 +452,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
           return (
             <div style={{ ...commonStyles.main }}>
               <div style={commonStyles.container}>
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="120"
                   height="120"
@@ -535,7 +536,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                   boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                 }}
               >
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="120"
                   height="120"
@@ -612,7 +613,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                   borderRadius: "20px",
                 }}
               >
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="100"
                   height="100"
@@ -662,7 +663,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                       fontSize: "16px",
                     }}
                   >
-                    Let's Go!
+                    Let&apos;s Go!
                   </a>
                 </div>
                 <div
@@ -772,7 +773,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                     marginTop: "-36px",
                   }}
                 ></div>
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="80"
                   height="80"
@@ -800,7 +801,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                     color: "#555",
                   }}
                 >
-                  Hi {firstName}, you're just one click away from getting
+                  Hi {firstName}, you&apos;re just one click away from getting
                   started.
                 </p>
                 <div style={{ textAlign: "center", margin: "30px 0" }}>
@@ -845,7 +846,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
           return (
             <div style={{ ...commonStyles.main }}>
               <div style={commonStyles.container}>
-                <img
+                <Image
                   src={getEmailLogoUrl(logoUrl, product)}
                   width="120"
                   height="120"
@@ -863,8 +864,8 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({
                   </a>
                 </div>
                 <p style={commonStyles.paragraph}>
-                  If you didn't create an account with {product}, you can safely
-                  ignore this email.
+                  If you didn&apos;t create an account with {product}, you can
+                  safely ignore this email.
                 </p>
               </div>
               <p style={commonStyles.footer}>Securely powered by {product}.</p>
