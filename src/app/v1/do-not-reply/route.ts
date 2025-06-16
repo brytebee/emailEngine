@@ -1,4 +1,4 @@
-// app/api/v1/do-not-reply/route.ts
+// app/v1/do-not-reply/route.ts
 
 import CustomEmail from "@/components/email-templates/CustomEmail";
 import { NextResponse } from "next/server";
@@ -123,6 +123,7 @@ const sendMail = async (emailData: any) => {
     customBody,
     support,
     username, // Add username to track emails per user
+    attachments = [],
   } = emailData;
 
   // Validate username is provided
@@ -188,6 +189,12 @@ const sendMail = async (emailData: any) => {
   }
 
   try {
+    // Prepare attachments for Resend
+    const emailAttachments = attachments.map((attachment: any) => ({
+      filename: attachment.name,
+      path: attachment.url, // Cloudinary URL
+    }));
+
     const res = await resend.emails.send({
       from: `${product} <${from}>`,
       to: contacts ?? to,
@@ -200,6 +207,7 @@ const sendMail = async (emailData: any) => {
         customBody: customBody,
         subject: subject,
       }),
+      attachments: emailAttachments,
     });
 
     // Increment email count only after successful send

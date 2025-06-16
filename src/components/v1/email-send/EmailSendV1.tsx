@@ -149,7 +149,7 @@ export default function EmailSendV1() {
     setErrors({});
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (emailData?: any) => {
     // Check email limit before sending
     if (!canSendEmail) {
       showFeedback(
@@ -163,16 +163,20 @@ export default function EmailSendV1() {
     setIsLoading(true);
 
     try {
-      const emailData = {
-        from: formData.sender,
-        to: formData.receiver,
-        subject: formData.subject,
-        firstName: formData.firstName,
+      // Use emailData if provided (from EmailForm with attachments), otherwise use formData
+      const dataToSend = emailData || formData;
+
+      const emailPayload = {
+        from: dataToSend.sender,
+        to: dataToSend.receiver,
+        subject: dataToSend.subject,
+        firstName: dataToSend.firstName,
         product: "CORPORATE AFFAIRS COMMISSION",
         logoUrl: logoUrl,
-        customBody: formData.body,
+        customBody: dataToSend.body,
         support: "helpdesk@cac.gov.ng",
-        username: auth.username, // Add username for server-side tracking
+        username: auth.username,
+        attachments: dataToSend.attachments || [], // Include attachments
       };
 
       const response = await fetch("/v1/do-not-reply", {
@@ -180,7 +184,7 @@ export default function EmailSendV1() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(emailData),
+        body: JSON.stringify(emailPayload),
       });
 
       const result = await response.json();
@@ -197,11 +201,14 @@ export default function EmailSendV1() {
 
         const tracking = result.emailTracking;
         const remainingAfterSend = tracking?.remainingEmails || 0;
+        const attachmentCount = dataToSend.attachments?.length || 0;
 
         showFeedback(
           "Email sent successfully!",
           "success",
-          `Email sent to ${formData.receiver} from ${formData.sender}. ${remainingAfterSend} emails remaining today.`
+          `Email sent to ${dataToSend.receiver} from ${dataToSend.sender}${
+            attachmentCount > 0 ? ` with ${attachmentCount} attachment(s)` : ""
+          }. ${remainingAfterSend} emails remaining today.`
         );
 
         // Reset form after success
@@ -241,7 +248,6 @@ export default function EmailSendV1() {
     }
   };
 
-  // Email limit warning component
   const EmailLimitWarning = () => {
     if (!auth.isAuthenticated) return null;
 
