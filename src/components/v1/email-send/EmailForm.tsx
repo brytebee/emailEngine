@@ -38,8 +38,10 @@ import {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_FILES = 5;
+
 const ACCEPTED_FILE_TYPES = [
   "image/jpeg",
+  "image/jpg", // Add explicit jpg support
   "image/png",
   "image/webp",
   "image/gif",
@@ -50,7 +52,6 @@ const ACCEPTED_FILE_TYPES = [
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ];
-
 interface AttachmentFile {
   id: string;
   name: string;
@@ -158,24 +159,31 @@ export default function EmailForm({
         "upload_preset",
         process.env.NEXT_PUBLIC_DOCS_UPLOAD_PRESET as string
       );
-      formData.append(
-        "cloud_name",
-        process.env.NEXT_PUBLIC_CLOUD_NAME as string
-      );
-      formData.append("resource_type", "auto"); // Auto-detect file type
+
+      // Always use 'raw' resource type for all files to avoid processing issues
+      const resourceType = "raw";
+      const cloudName = process.env.NEXT_PUBLIC_CLOUD_NAME as string;
 
       const response = await fetch(
-        process.env.NEXT_PUBLIC_CLOUDINARY_URL as string,
+        `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
         {
           method: "POST",
           body: formData,
         }
       );
 
-      if (!response.ok) throw new Error("Failed to upload file");
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Cloudinary upload error:", errorData);
+        throw new Error(
+          `Upload failed: ${errorData.error?.message || response.statusText}`
+        );
+      }
 
       const data = await response.json();
-      const { secure_url, original_filename, format, bytes } = data;
+      console.log("Cloudinary response:", data);
+
+      const { secure_url, original_filename, format, bytes, public_id } = data;
 
       setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }));
 
@@ -190,7 +198,7 @@ export default function EmailForm({
 
       return {
         id: fileId,
-        name: `${original_filename || file.name}.${format}`,
+        name: original_filename || file.name,
         size: bytes || file.size,
         type: file.type,
         url: secure_url,

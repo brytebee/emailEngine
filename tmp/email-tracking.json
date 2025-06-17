@@ -1,14 +1,14 @@
 {
   "admin": {
     "username": "admin",
-    "count": 17,
+    "count": 7,
     "date": "2025-06-16",
     "lastReset": "2025-06-16T11:51:47.414Z"
   },
   "umar001": {
     "username": "umar001",
-    "count": 6,
-    "date": "2025-06-16",
-    "lastReset": "2025-06-16T12:30:11.456Z"
+    "count": 12,
+    "date": "2025-06-17",
+    "lastReset": "2025-06-17T11:01:12.126Z"
   }
 }

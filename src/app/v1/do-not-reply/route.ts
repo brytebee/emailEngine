@@ -12,7 +12,7 @@ const { d3, RESEND_API_KEY_CPA } = process.env;
 interface UserEmailCount {
   username: string;
   count: number;
-  date: string; // YYYY-MM-DD format
+  date: string;
   lastReset: string;
 }
 
@@ -20,14 +20,12 @@ interface EmailTrackingData {
   [username: string]: UserEmailCount;
 }
 
-// File path for storing email counts (in tmp directory for serverless)
 const EMAIL_TRACKING_FILE = path.join(
   process.cwd(),
   "tmp",
   "email-tracking.json"
 );
 
-// Ensure tmp directory exists
 const ensureTmpDir = () => {
   const tmpDir = path.dirname(EMAIL_TRACKING_FILE);
   if (!fs.existsSync(tmpDir)) {
@@ -35,12 +33,10 @@ const ensureTmpDir = () => {
   }
 };
 
-// Get current date in YYYY-MM-DD format
 const getCurrentDate = (): string => {
   return new Date().toISOString().split("T")[0];
 };
 
-// Load email tracking data from file
 const loadEmailTrackingData = (): EmailTrackingData => {
   try {
     ensureTmpDir();
@@ -54,7 +50,6 @@ const loadEmailTrackingData = (): EmailTrackingData => {
   return {};
 };
 
-// Save email tracking data to file
 const saveEmailTrackingData = (data: EmailTrackingData): void => {
   try {
     ensureTmpDir();
@@ -64,13 +59,11 @@ const saveEmailTrackingData = (data: EmailTrackingData): void => {
   }
 };
 
-// Get or create user email count record
 const getUserEmailCount = (username: string): UserEmailCount => {
   const data = loadEmailTrackingData();
   const currentDate = getCurrentDate();
 
   if (!data[username] || data[username].date !== currentDate) {
-    // Create new record or reset for new day
     data[username] = {
       username,
       count: 0,
@@ -83,7 +76,6 @@ const getUserEmailCount = (username: string): UserEmailCount => {
   return data[username];
 };
 
-// Increment user email count
 const incrementUserEmailCount = (username: string): UserEmailCount => {
   const data = loadEmailTrackingData();
   const userCount = getUserEmailCount(username);
@@ -95,13 +87,89 @@ const incrementUserEmailCount = (username: string): UserEmailCount => {
   return userCount;
 };
 
-// Check if user can send email (within daily limit)
 const canUserSendEmail = (
   username: string,
   dailyLimit: number = 20
 ): boolean => {
   const userCount = getUserEmailCount(username);
   return userCount.count < dailyLimit;
+};
+
+// Helper function to get MIME type from file extension
+const getMimeType = (filename: string): string => {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  const mimeTypes: { [key: string]: string } = {
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    txt: "text/plain",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+    // Add more file types
+    csv: "text/csv",
+    rtf: "application/rtf",
+    zip: "application/zip",
+    rar: "application/x-rar-compressed",
+  };
+  return mimeTypes[ext || ""] || "application/octet-stream";
+};
+
+// Helper function to fetch file from Cloudinary and convert to buffer
+const fetchAttachmentBuffer = async (
+  url: string,
+  filename: string,
+  originalType: string
+) => {
+  try {
+    console.log(`Fetching attachment: ${filename} from ${url}`);
+    console.log(`Original file type: ${originalType}`);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "User-Agent": "EmailService/1.0",
+        Accept: "*/*",
+      },
+      // Add timeout
+      signal: AbortSignal.timeout(30000), // 30 second timeout
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch attachment: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const contentType = response.headers.get("content-type");
+    console.log(`Content-Type from Cloudinary: ${contentType}`);
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    console.log(
+      `Successfully fetched ${filename}, size: ${buffer.length} bytes`
+    );
+
+    // Prefer original file type, fallback to detected or guessed
+    let finalContentType = originalType;
+    if (!finalContentType || finalContentType === "application/octet-stream") {
+      finalContentType = contentType || getMimeType(filename);
+    }
+
+    return {
+      content: buffer,
+      contentType: finalContentType,
+      size: buffer.length,
+    };
+  } catch (error) {
+    console.error(`Error fetching attachment ${filename}:`, error);
+    throw error;
+  }
 };
 
 const sendMail = async (emailData: any) => {
@@ -122,11 +190,10 @@ const sendMail = async (emailData: any) => {
     logoUrl,
     customBody,
     support,
-    username, // Add username to track emails per user
+    username,
     attachments = [],
   } = emailData;
 
-  // Validate username is provided
   if (!username) {
     return NextResponse.json({
       status: 400,
@@ -135,12 +202,11 @@ const sendMail = async (emailData: any) => {
     });
   }
 
-  // Check email limit before processing
   const dailyLimit = 20;
   if (!canUserSendEmail(username, dailyLimit)) {
     const userCount = getUserEmailCount(username);
     return NextResponse.json({
-      status: 429, // Too Many Requests
+      status: 429,
       message: "failed",
       error: "Daily email limit exceeded",
       details: {
@@ -171,7 +237,6 @@ const sendMail = async (emailData: any) => {
   const resend = new Resend(API_KEY);
   let contacts: string | null = null;
 
-  // For collection of emails eg ['a@a.com', 'b@b.com', ...]
   if (typeof to === "string" && to.length > 1 && to.includes("'")) {
     try {
       contacts = JSON.parse(to.replace(/'/g, '"'));
@@ -189,13 +254,106 @@ const sendMail = async (emailData: any) => {
   }
 
   try {
-    // Prepare attachments for Resend
-    const emailAttachments = attachments.map((attachment: any) => ({
-      filename: attachment.name,
-      path: attachment.url, // Cloudinary URL
-    }));
+    // Process attachments - fetch content from Cloudinary URLs
+    const emailAttachments = [];
+    const attachmentErrors = [];
 
-    const res = await resend.emails.send({
+    if (attachments && attachments.length > 0) {
+      console.log(`Processing ${attachments.length} attachments...`);
+
+      for (const attachment of attachments) {
+        try {
+          console.log(`Processing attachment:`, {
+            id: attachment.id,
+            name: attachment.name,
+            originalName: attachment.originalName,
+            type: attachment.type,
+            size: attachment.size,
+            url: attachment.url,
+          });
+
+          const { content, contentType, size } = await fetchAttachmentBuffer(
+            attachment.url,
+            attachment.name,
+            attachment.type
+          );
+
+          // Validate file size (Resend has a 40MB total limit, 10MB per file is safe)
+          const maxSize = 10 * 1024 * 1024; // 10MB
+          if (size > maxSize) {
+            const error = `Attachment ${attachment.name} is too large: ${(
+              size /
+              1024 /
+              1024
+            ).toFixed(2)}MB (max 10MB)`;
+            console.warn(error);
+            attachmentErrors.push(error);
+            continue;
+          }
+
+          // Validate content buffer
+          if (!content || content.length === 0) {
+            const error = `Attachment ${attachment.name} has no content`;
+            console.warn(error);
+            attachmentErrors.push(error);
+            continue;
+          }
+
+          emailAttachments.push({
+            filename: attachment.originalName || attachment.name, // Use original filename
+            content: content,
+            contentType: contentType,
+          });
+
+          console.log(
+            `✓ Added attachment: ${attachment.name} (${contentType}, ${(
+              size / 1024
+            ).toFixed(1)}KB)`
+          );
+        } catch (attachmentError) {
+          const error =
+            attachmentError instanceof Error
+              ? `Failed to process attachment ${attachment.name}: ${attachmentError.message}`
+              : "Processing failed due to unknown error";
+          console.error(error);
+          attachmentErrors.push(error);
+          // Continue with other attachments instead of failing the entire email
+        }
+      }
+
+      console.log(
+        `Successfully processed ${emailAttachments.length} out of ${attachments.length} attachments`
+      );
+
+      if (attachmentErrors.length > 0) {
+        console.warn("Attachment processing errors:", attachmentErrors);
+      }
+    }
+
+    // Calculate total attachment size
+    const totalSize = emailAttachments.reduce(
+      (sum, att) => sum + att.content.length,
+      0
+    );
+    const maxTotalSize = 25 * 1024 * 1024; // 25MB total limit for safety
+
+    if (totalSize > maxTotalSize) {
+      console.warn(
+        `Total attachment size too large: ${(totalSize / 1024 / 1024).toFixed(
+          2
+        )}MB`
+      );
+      return NextResponse.json({
+        status: 400,
+        message: "failed",
+        error: `Total attachment size (${(totalSize / 1024 / 1024).toFixed(
+          2
+        )}MB) exceeds limit (25MB)`,
+      });
+    }
+
+    // Send email with processed attachments
+    const emailPayload: any = {
       from: `${product} <${from}>`,
       to: contacts ?? to,
       subject,
@@ -207,8 +365,22 @@ const sendMail = async (emailData: any) => {
         customBody: customBody,
         subject: subject,
       }),
-      attachments: emailAttachments,
-    });
+    };
+
+    // Only add attachments if we have any
+    if (emailAttachments.length > 0) {
+      emailPayload.attachments = emailAttachments;
+      console.log(
+        `Sending email with ${emailAttachments.length} attachments (${(
+          totalSize /
+          1024 /
+          1024
+        ).toFixed(2)}MB total)`
+      );
+    }
+
+    const res = await resend.emails.send(emailPayload);
+    console.log("Email sent successfully:", res);
 
     // Increment email count only after successful send
     const updatedUserCount = incrementUserEmailCount(username);
@@ -223,6 +395,18 @@ const sendMail = async (emailData: any) => {
         remainingEmails,
         showWarning: remainingEmails <= 5 && remainingEmails > 0,
         canSendMore: remainingEmails > 0,
+      },
+      attachmentInfo: {
+        requested: attachments.length,
+        processed: emailAttachments.length,
+        failed: attachmentErrors.length,
+        errors: attachmentErrors.length > 0 ? attachmentErrors : undefined,
+        attachments: emailAttachments.map((a) => ({
+          filename: a.filename,
+          contentType: a.contentType,
+          size: a.content.length,
+        })),
+        totalSize: totalSize,
       },
     });
   } catch (error) {
@@ -248,7 +432,6 @@ export async function POST(req: Request) {
   }
 }
 
-// GET endpoint to check email count without sending
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
