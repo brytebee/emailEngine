@@ -174,15 +174,12 @@ export default function EmailForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Cloudinary upload error:", errorData);
         throw new Error(
           `Upload failed: ${errorData.error?.message || response.statusText}`
         );
       }
 
       const data = await response.json();
-      console.log("Cloudinary response:", data);
-
       const { secure_url, original_filename, format, bytes, public_id } = data;
 
       setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }));

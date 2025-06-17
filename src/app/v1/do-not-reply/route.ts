@@ -126,9 +126,6 @@ const fetchAttachmentBuffer = async (
   originalType: string
 ) => {
   try {
-    console.log(`Fetching attachment: ${filename} from ${url}`);
-    console.log(`Original file type: ${originalType}`);
-
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -146,14 +143,9 @@ const fetchAttachmentBuffer = async (
     }
 
     const contentType = response.headers.get("content-type");
-    console.log(`Content-Type from Cloudinary: ${contentType}`);
 
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-
-    console.log(
-      `Successfully fetched ${filename}, size: ${buffer.length} bytes`
-    );
 
     // Prefer original file type, fallback to detected or guessed
     let finalContentType = originalType;
@@ -259,19 +251,8 @@ const sendMail = async (emailData: any) => {
     const attachmentErrors = [];
 
     if (attachments && attachments.length > 0) {
-      console.log(`Processing ${attachments.length} attachments...`);
-
       for (const attachment of attachments) {
         try {
-          console.log(`Processing attachment:`, {
-            id: attachment.id,
-            name: attachment.name,
-            originalName: attachment.originalName,
-            type: attachment.type,
-            size: attachment.size,
-            url: attachment.url,
-          });
-
           const { content, contentType, size } = await fetchAttachmentBuffer(
             attachment.url,
             attachment.name,
@@ -320,14 +301,6 @@ const sendMail = async (emailData: any) => {
           // Continue with other attachments instead of failing the entire email
         }
       }
-
-      console.log(
-        `Successfully processed ${emailAttachments.length} out of ${attachments.length} attachments`
-      );
-
-      if (attachmentErrors.length > 0) {
-        console.warn("Attachment processing errors:", attachmentErrors);
-      }
     }
 
     // Calculate total attachment size
@@ -370,17 +343,9 @@ const sendMail = async (emailData: any) => {
     // Only add attachments if we have any
     if (emailAttachments.length > 0) {
       emailPayload.attachments = emailAttachments;
-      console.log(
-        `Sending email with ${emailAttachments.length} attachments (${(
-          totalSize /
-          1024 /
-          1024
-        ).toFixed(2)}MB total)`
-      );
     }
 
     const res = await resend.emails.send(emailPayload);
-    console.log("Email sent successfully:", res);
 
     // Increment email count only after successful send
     const updatedUserCount = incrementUserEmailCount(username);
@@ -410,7 +375,6 @@ const sendMail = async (emailData: any) => {
       },
     });
   } catch (error) {
-    console.error("Error sending email:", error);
     return NextResponse.json({
       status: 500,
       message: "failed",
