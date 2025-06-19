@@ -3,97 +3,16 @@
 import CustomEmail from "@/components/email-templates/CustomEmail";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import fs from "fs";
-import path from "path";
+import {
+  getUserEmailTrackingFromExcel,
+  incrementUserEmailCountInExcel,
+  canUserSendEmailFromExcel,
+  getEmailStatsFromExcel,
+  cleanupOldExcelData,
+  exportEmailTrackingToCSV,
+} from "@/lib/googleSheetsEmailTracking";
 
 const { d3, RESEND_API_KEY_CPA } = process.env;
-
-// Email tracking types
-interface UserEmailCount {
-  username: string;
-  count: number;
-  date: string;
-  lastReset: string;
-}
-
-interface EmailTrackingData {
-  [username: string]: UserEmailCount;
-}
-
-const EMAIL_TRACKING_FILE = path.join(
-  process.cwd(),
-  "tmp",
-  "email-tracking.json"
-);
-
-const ensureTmpDir = () => {
-  const tmpDir = path.dirname(EMAIL_TRACKING_FILE);
-  if (!fs.existsSync(tmpDir)) {
-    fs.mkdirSync(tmpDir, { recursive: true });
-  }
-};
-
-const getCurrentDate = (): string => {
-  return new Date().toISOString().split("T")[0];
-};
-
-const loadEmailTrackingData = (): EmailTrackingData => {
-  try {
-    ensureTmpDir();
-    if (fs.existsSync(EMAIL_TRACKING_FILE)) {
-      const data = fs.readFileSync(EMAIL_TRACKING_FILE, "utf8");
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error("Error loading email tracking data:", error);
-  }
-  return {};
-};
-
-const saveEmailTrackingData = (data: EmailTrackingData): void => {
-  try {
-    ensureTmpDir();
-    fs.writeFileSync(EMAIL_TRACKING_FILE, JSON.stringify(data, null, 2));
-  } catch (error) {
-    console.error("Error saving email tracking data:", error);
-  }
-};
-
-const getUserEmailCount = (username: string): UserEmailCount => {
-  const data = loadEmailTrackingData();
-  const currentDate = getCurrentDate();
-
-  if (!data[username] || data[username].date !== currentDate) {
-    data[username] = {
-      username,
-      count: 0,
-      date: currentDate,
-      lastReset: new Date().toISOString(),
-    };
-    saveEmailTrackingData(data);
-  }
-
-  return data[username];
-};
-
-const incrementUserEmailCount = (username: string): UserEmailCount => {
-  const data = loadEmailTrackingData();
-  const userCount = getUserEmailCount(username);
-
-  userCount.count += 1;
-  data[username] = userCount;
-  saveEmailTrackingData(data);
-
-  return userCount;
-};
-
-const canUserSendEmail = (
-  username: string,
-  dailyLimit: number = 20
-): boolean => {
-  const userCount = getUserEmailCount(username);
-  return userCount.count < dailyLimit;
-};
 
 // Helper function to get MIME type from file extension
 const getMimeType = (filename: string): string => {
@@ -110,7 +29,6 @@ const getMimeType = (filename: string): string => {
     png: "image/png",
     gif: "image/gif",
     webp: "image/webp",
-    // Add more file types
     csv: "text/csv",
     rtf: "application/rtf",
     zip: "application/zip",
@@ -132,7 +50,6 @@ const fetchAttachmentBuffer = async (
         "User-Agent": "EmailService/1.0",
         Accept: "*/*",
       },
-      // Add timeout
       signal: AbortSignal.timeout(30000), // 30 second timeout
     });
 
@@ -143,11 +60,9 @@ const fetchAttachmentBuffer = async (
     }
 
     const contentType = response.headers.get("content-type");
-
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Prefer original file type, fallback to detected or guessed
     let finalContentType = originalType;
     if (!finalContentType || finalContentType === "application/octet-stream") {
       finalContentType = contentType || getMimeType(filename);
@@ -195,17 +110,22 @@ const sendMail = async (emailData: any) => {
   }
 
   const dailyLimit = 20;
-  if (!canUserSendEmail(username, dailyLimit)) {
-    const userCount = getUserEmailCount(username);
+
+  // Check if user can send email using Excel tracking
+  if (!canUserSendEmailFromExcel(username, dailyLimit)) {
+    const userTracking = await getUserEmailTrackingFromExcel(
+      username,
+      dailyLimit
+    );
     return NextResponse.json({
       status: 429,
       message: "failed",
       error: "Daily email limit exceeded",
       details: {
-        emailsSent: userCount.count,
-        dailyLimit,
-        remainingEmails: 0,
-        resetTime: new Date(userCount.date + "T23:59:59.999Z").toISOString(),
+        emailsSent: userTracking.emailsSent,
+        dailyLimit: userTracking.dailyLimit,
+        remainingEmails: userTracking.remainingEmails,
+        resetTime: new Date(userTracking.date + "T23:59:59.999Z").toISOString(),
       },
     });
   }
@@ -259,7 +179,6 @@ const sendMail = async (emailData: any) => {
             attachment.type
           );
 
-          // Validate file size (Resend has a 40MB total limit, 10MB per file is safe)
           const maxSize = 10 * 1024 * 1024; // 10MB
           if (size > maxSize) {
             const error = `Attachment ${attachment.name} is too large: ${(
@@ -272,7 +191,6 @@ const sendMail = async (emailData: any) => {
             continue;
           }
 
-          // Validate content buffer
           if (!content || content.length === 0) {
             const error = `Attachment ${attachment.name} has no content`;
             console.warn(error);
@@ -281,7 +199,7 @@ const sendMail = async (emailData: any) => {
           }
 
           emailAttachments.push({
-            filename: attachment.originalName || attachment.name, // Use original filename
+            filename: attachment.originalName || attachment.name,
             content: content,
             contentType: contentType,
           });
@@ -298,7 +216,6 @@ const sendMail = async (emailData: any) => {
               : "Processing failed due to unknown error";
           console.error(error);
           attachmentErrors.push(error);
-          // Continue with other attachments instead of failing the entire email
         }
       }
     }
@@ -308,7 +225,7 @@ const sendMail = async (emailData: any) => {
       (sum, att) => sum + att.content.length,
       0
     );
-    const maxTotalSize = 25 * 1024 * 1024; // 25MB total limit for safety
+    const maxTotalSize = 25 * 1024 * 1024; // 25MB total limit
 
     if (totalSize > maxTotalSize) {
       console.warn(
@@ -340,26 +257,32 @@ const sendMail = async (emailData: any) => {
       }),
     };
 
-    // Only add attachments if we have any
     if (emailAttachments.length > 0) {
       emailPayload.attachments = emailAttachments;
     }
 
     const res = await resend.emails.send(emailPayload);
 
-    // Increment email count only after successful send
-    const updatedUserCount = incrementUserEmailCount(username);
-    const remainingEmails = Math.max(0, dailyLimit - updatedUserCount.count);
+    // Increment email count in Excel after successful send
+    const updatedUserTracking = await incrementUserEmailCountInExcel(
+      username,
+      dailyLimit
+    );
 
     return NextResponse.json({
       message: "success",
       res,
       emailTracking: {
-        emailsSent: updatedUserCount.count,
-        dailyLimit,
-        remainingEmails,
-        showWarning: remainingEmails <= 5 && remainingEmails > 0,
-        canSendMore: remainingEmails > 0,
+        emailsSent: updatedUserTracking.emailsSent,
+        dailyLimit: updatedUserTracking.dailyLimit,
+        remainingEmails: updatedUserTracking.remainingEmails,
+        showWarning:
+          updatedUserTracking.remainingEmails <= 5 &&
+          updatedUserTracking.remainingEmails > 0,
+        canSendMore: updatedUserTracking.remainingEmails > 0,
+        resetTime: new Date(
+          updatedUserTracking.date + "T23:59:59.999Z"
+        ).toISOString(),
       },
       attachmentInfo: {
         requested: attachments.length,
@@ -400,7 +323,36 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const username = url.searchParams.get("username");
+    const action = url.searchParams.get("action");
 
+    // Handle different actions
+    if (action === "stats") {
+      const stats = getEmailStatsFromExcel();
+      return NextResponse.json({
+        message: "success",
+        stats,
+      });
+    }
+
+    if (action === "cleanup") {
+      const daysToKeep = parseInt(url.searchParams.get("days") || "30");
+      cleanupOldExcelData(daysToKeep);
+      return NextResponse.json({
+        message: "success",
+        info: `Cleaned up data older than ${daysToKeep} days`,
+      });
+    }
+
+    if (action === "export") {
+      const csvPath = exportEmailTrackingToCSV();
+      return NextResponse.json({
+        message: "success",
+        info: "Data exported to CSV",
+        csvPath,
+      });
+    }
+
+    // Default action - get user email count
     if (!username) {
       return NextResponse.json({
         status: 400,
@@ -410,25 +362,29 @@ export async function GET(req: Request) {
     }
 
     const dailyLimit = 20;
-    const userCount = getUserEmailCount(username);
-    const remainingEmails = Math.max(0, dailyLimit - userCount.count);
+    const userTracking = await getUserEmailTrackingFromExcel(
+      username,
+      dailyLimit
+    );
 
     return NextResponse.json({
       message: "success",
       emailTracking: {
-        emailsSent: userCount.count,
-        dailyLimit,
-        remainingEmails,
-        showWarning: remainingEmails <= 5 && remainingEmails > 0,
-        canSendMore: remainingEmails > 0,
-        resetTime: new Date(userCount.date + "T23:59:59.999Z").toISOString(),
+        emailsSent: userTracking.emailsSent,
+        dailyLimit: userTracking.dailyLimit,
+        remainingEmails: userTracking.remainingEmails,
+        showWarning:
+          userTracking.remainingEmails <= 5 && userTracking.remainingEmails > 0,
+        canSendMore: userTracking.remainingEmails > 0,
+        resetTime: new Date(userTracking.date + "T23:59:59.999Z").toISOString(),
+        lastReset: userTracking.lastReset,
       },
     });
   } catch (error) {
     return NextResponse.json({
       status: 500,
       message: "failed",
-      error: "Error fetching email count",
+      error: "Error processing request",
     });
   }
 }
