@@ -4,6 +4,13 @@ This product is a helper built from the resend email package.
 
 It is used to send an email from an application to the email of a user. It can be extended to serve confirmation message or mass email sender.
 
+## Adding new domains requires the following updates:
+
+1. Add domain and API key to .env.local
+2. Include the in config/email-domains.ts
+3. Push to create an updated build
+4. Start emailing...
+
 ## General Arguments
 
 It takes the following arguements:
