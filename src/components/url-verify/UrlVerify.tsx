@@ -15,21 +15,23 @@ import * as React from "react";
 import { getEmailLogoUrl } from "@/utils/imageUtils";
 
 interface Props {
-  resetToken?: string;
-  resetUrl?: string;
+  token?: string;
+  url?: string;
   firstName?: string;
   product?: string;
   logoUrl?: string;
   support?: string;
+  reset?: boolean;
 }
 
 export const UrlVerifyEmail = ({
-  resetToken,
-  resetUrl,
+  token,
+  url,
   firstName,
   product,
   logoUrl,
   support,
+  reset,
 }: Props) => (
   <Html>
     <Head />
@@ -43,17 +45,21 @@ export const UrlVerifyEmail = ({
           style={logo}
         />
         <Text style={greeting}>Hi, {firstName}</Text>
-        <Text style={tertiary}>Reset Your Password</Text>
+        <Text style={tertiary}>
+          {reset ? "Reset Your Password" : "Verify Your Email"}
+        </Text>
         <Heading style={secondary}>
-          Click the button below to reset your password.
+          {reset
+            ? "Click the button below to reset your password."
+            : "Click the button below to verify your email."}
         </Heading>
         <Section style={buttonContainer}>
-          <Link href={resetUrl} style={buttonStyle}>
-            Reset Password
+          <Link href={url || ""} style={buttonStyle}>
+            {reset ? "Reset Password" : "Verify Email"}
           </Link>
         </Section>
         <Text style={tokenText}>
-          Or use this token: <Link style={link}>{resetToken}</Link>
+          Or use this token: <Link style={link}>{token}</Link>
         </Text>
         <Text style={paragraph}>Not expecting this email?</Text>
         <Text style={paragraph}>
@@ -62,7 +68,7 @@ export const UrlVerifyEmail = ({
             {support && support}
           </Link>{" "}
           {!support && "Please delete and ignore "}if you did not request this
-          password reset.
+          {reset ? "password reset." : "email verification."}
         </Text>
       </Container>
       <Text style={footer}>Securely powered by {product}.</Text>

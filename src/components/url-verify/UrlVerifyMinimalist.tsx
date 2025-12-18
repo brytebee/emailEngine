@@ -15,21 +15,23 @@ import * as React from "react";
 import { getEmailLogoUrl } from "@/utils/imageUtils";
 
 interface Props {
-  resetToken?: string;
-  resetUrl?: string;
+  token?: string;
+  url?: string;
   firstName?: string;
   product?: string;
   logoUrl?: string;
   support?: string;
+  reset?: boolean;
 }
 
 export const UrlVerifyMinimalist = ({
-  resetToken,
-  resetUrl,
+  token,
+  url,
   firstName,
   product,
   logoUrl,
   support,
+  reset,
 }: Props) => (
   <Html>
     <Head />
@@ -44,33 +46,40 @@ export const UrlVerifyMinimalist = ({
         />
         <Section style={contentSection}>
           <Text style={greeting}>Hello {firstName},</Text>
-          <Heading style={heading}>Password Reset Request</Heading>
+          <Heading style={heading}>
+            {reset ? "Password Reset Request" : "Verify Email"}
+          </Heading>
           <Text style={paragraph}>
-            We received a request to reset your password. Use the button below
-            to create a new password.
+            {reset
+              ? "We received a request to reset your password. Use the button below to create a new password."
+              : "Thanks for signing up! Use the button below to verify your email address."}
           </Text>
           <Section style={buttonContainer}>
-            <Link href={resetUrl} style={buttonStyle}>
-              Reset Password
+            <Link href={url} style={buttonStyle}>
+              {reset ? "Reset Password" : "Verify Email"}
             </Link>
           </Section>
           <Text style={tokenWrapper}>
-            If the button doesn&apos;t work, use this token:
+            If the button doesn&apos;t work, use this{" "}
+            {reset ? "reset" : "verification"} token:
             <Section style={tokenContainer}>
-              <Text style={tokenStyle}>{resetToken}</Text>
+              <Text style={tokenStyle}>{token}</Text>
             </Section>
           </Text>
           <Section style={divider}></Section>
           <Text style={footerText}>
             {support ? (
               <>
-                If you didn&apos;t request this change, please contact us at{" "}
+                If you didn&apos;t request this{" "}
+                {reset ? "change" : "verification"}, please contact us at{" "}
                 <Link href={`mailto:${support}`} style={link}>
                   {support}
                 </Link>
               </>
             ) : (
-              "If you didn't request this change, you can safely ignore this email."
+              `If you didn't request this ${
+                reset ? "change" : "verification"
+              }, you can safely ignore this email.`
             )}
           </Text>
         </Section>

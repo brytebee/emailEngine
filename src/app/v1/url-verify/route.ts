@@ -23,9 +23,10 @@ type EmailTemplate =
   | "tech";
 
 interface UrlVerifyEmailData extends BaseEmailData {
-  resetToken: string;
-  resetUrl: string;
+  token: string;
+  url: string;
   template?: EmailTemplate;
+  reset?: boolean;
 }
 
 const templateComponents = {
@@ -42,11 +43,12 @@ const sendMail = async (emailData: UrlVerifyEmailData) => {
     templateComponents,
     defaultTemplate: UrlVerifyEmail,
     getTemplateProps: (data) => ({
-      resetToken: data.resetToken,
-      resetUrl: data.resetUrl,
+      token: data.token,
+      url: data.url,
       firstName: data.firstName,
       product: data.product,
       logoUrl: data.logoUrl,
+      reset: data.reset,
     }),
   });
 };

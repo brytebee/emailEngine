@@ -15,21 +15,23 @@ import * as React from "react";
 import { getEmailLogoUrl } from "@/utils/imageUtils";
 
 interface Props {
-  resetToken?: string;
-  resetUrl?: string;
+  token?: string;
+  url?: string;
   firstName?: string;
   product?: string;
   logoUrl?: string;
   support?: string;
+  reset?: boolean;
 }
 
 export const UrlVerifyCreative = ({
-  resetToken,
-  resetUrl,
+  token,
+  url,
   firstName,
   product,
   logoUrl,
   support,
+  reset,
 }: Props) => (
   <Html>
     <Head />
@@ -46,20 +48,25 @@ export const UrlVerifyCreative = ({
           />
         </Section>
         <Section style={heroSection}>
-          <Heading style={heroHeading}>Reset Your Password</Heading>
+          <Heading style={heroHeading}>
+            {reset ? "Reset Your Password" : "Verify Your Email"}
+          </Heading>
           <Text style={heroText}>
-            Let&apos;s get you back in action, {firstName}!
+            {reset
+              ? "Let's get you back in action"
+              : "Let's verify your account"}
+            , {firstName}!
           </Text>
         </Section>
         <Section style={contentSection}>
           <Text style={paragraph}>
-            We received a request to reset your password. No worries — it
-            happens to the best of us! Just click the button below to create a
-            new password.
+            {reset
+              ? "We received a request to reset your password. No worries — it happens to the best of us! Just click the button below to create a new password."
+              : "We're excited to have you on board! Please click the button below to verify your email address."}
           </Text>
           <Section style={buttonWrapper}>
-            <Link href={resetUrl} style={buttonStyle}>
-              Create New Password
+            <Link href={url} style={buttonStyle}>
+              {reset ? "Create New Password" : "Verify Email"}
             </Link>
           </Section>
           <Section style={tokenSection}>
@@ -73,13 +80,13 @@ export const UrlVerifyCreative = ({
               Alternatively, use this token
             </Text>
             <Section style={tokenContainer}>
-              <Text style={tokenStyle}>{resetToken}</Text>
+              <Text style={tokenStyle}>{token}</Text>
             </Section>
           </Section>
           <Section style={divider}></Section>
           <Text style={noteText}>
-            If you didn&apos;t request this reset, you can safely ignore this
-            email
+            If you didn&apos;t request this {reset ? "reset" : "verification"},
+            you can safely ignore this email
             {support && (
               <>
                 {" "}

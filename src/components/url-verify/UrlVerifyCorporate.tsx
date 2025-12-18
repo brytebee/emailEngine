@@ -15,21 +15,23 @@ import * as React from "react";
 import { getEmailLogoUrl } from "@/utils/imageUtils";
 
 interface Props {
-  resetToken?: string;
-  resetUrl?: string;
+  token?: string;
+  url?: string;
   firstName?: string;
   product?: string;
   logoUrl?: string;
   support?: string;
+  reset?: boolean;
 }
 
 export const UrlVerifyCorporate = ({
-  resetToken,
-  resetUrl,
+  token,
+  url,
   firstName,
   product,
   logoUrl,
   support,
+  reset,
 }: Props) => (
   <Html>
     <Head />
@@ -46,18 +48,20 @@ export const UrlVerifyCorporate = ({
           />
         </Section>
         <Section style={banner}>
-          <Heading style={bannerHeading}>Password Reset</Heading>
+          <Heading style={bannerHeading}>
+            {reset ? "Password Reset" : "Verify Email"}
+          </Heading>
         </Section>
         <Section style={contentSection}>
           <Text style={greeting}>Dear {firstName},</Text>
           <Text style={paragraph}>
-            A password reset has been requested for your account. Please use the
-            button below to set a new password and regain access to your
-            account.
+            {reset
+              ? "A password reset has been requested for your account. Please use the button below to set a new password and regain access to your account."
+              : "Thanks for signing up! Please use the button below to verify your email address and activate your account."}
           </Text>
           <Section style={buttonContainer}>
-            <Link href={resetUrl} style={buttonStyle}>
-              Reset Your Password
+            <Link href={url} style={buttonStyle}>
+              {reset ? "Reset Your Password" : "Verify Your Email"}
             </Link>
           </Section>
           <Section style={infoBox}>
@@ -66,10 +70,10 @@ export const UrlVerifyCorporate = ({
               For security purposes, this request will expire in 24 hours.
             </Text>
             <Text style={infoText}>
-              If you need to use a reset token instead, please enter the
-              following code:
+              If you need to use a {reset ? "reset" : "verification"} token
+              instead, please enter the following code:
             </Text>
-            <Text style={tokenStyle}>{resetToken}</Text>
+            <Text style={tokenStyle}>{token}</Text>
           </Section>
           <Text style={paragraph}>
             {support && "Contact "}
@@ -77,7 +81,7 @@ export const UrlVerifyCorporate = ({
               {support && support}
             </Link>{" "}
             {!support && "Please delete and ignore "}if you did not request this
-            password reset.
+            {reset ? " password reset." : " email verification."}
           </Text>
         </Section>
         <Section style={footerSection}>

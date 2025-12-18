@@ -15,21 +15,23 @@ import * as React from "react";
 import { getEmailLogoUrl } from "@/utils/imageUtils";
 
 interface Props {
-  resetToken?: string;
-  resetUrl?: string;
+  token?: string;
+  url?: string;
   firstName?: string;
   product?: string;
   logoUrl?: string;
   support?: string;
+  reset?: boolean;
 }
 
 export const UrlVerifyTech = ({
-  resetToken,
-  resetUrl,
+  token,
+  url,
   firstName,
   product,
   logoUrl,
   support,
+  reset,
 }: Props) => (
   <Html>
     <Head />
@@ -43,7 +45,9 @@ export const UrlVerifyTech = ({
             alt={product || "Company Logo"}
             style={logo}
           />
-          <Text style={headerTag}>{`<PASSWORD_RESET>`}</Text>
+          <Text style={headerTag}>{`<${
+            reset ? "PASSWORD_RESET" : "EMAIL_VERIFY"
+          }>`}</Text>
         </Section>
 
         <Section style={contentSection}>
@@ -52,7 +56,8 @@ export const UrlVerifyTech = ({
           </Section>
 
           <Heading style={heading}>
-            <Text style={accent}>{`# `}</Text>Password Reset Request
+            <Text style={accent}>{`# `}</Text>
+            {reset ? "Password Reset Request" : "Email Verification"}
           </Heading>
 
           <Section style={infoGrid}>
@@ -71,22 +76,28 @@ export const UrlVerifyTech = ({
           </Section>
 
           <Text style={paragraph}>
-            A password reset has been initiated for your account. To complete
-            this process and create a new secure password, click the button
-            below.
+            {reset
+              ? "A password reset has been initiated for your account. To complete this process and create a new secure password, click the button below."
+              : "A new account registration has been initiated. To activate your account, click the button below."}
           </Text>
 
           <Section style={codeBlock}>
-            <Text style={codeComment}> == // Reset your password securely</Text>
-            <Link href={resetUrl} style={resetButton}>
-              RESET PASSWORD
+            <Text style={codeComment}>
+              {" "}
+              == //{" "}
+              {reset
+                ? "Reset your password securely"
+                : "Verify your email address"}
+            </Text>
+            <Link href={url} style={resetButton}>
+              {reset ? "RESET PASSWORD" : "VERIFY EMAIL"}
             </Link>
             <Text style={codeComment}> == // Token expires in 24 hours</Text>
           </Section>
 
           <Section style={tokenSection}>
             <Text style={tokenLabel}>TOKEN ACCESS CODE:</Text>
-            <Text style={tokenValue}>{resetToken}</Text>
+            <Text style={tokenValue}>{token}</Text>
           </Section>
 
           <Section style={securitySection}>
@@ -96,14 +107,18 @@ export const UrlVerifyTech = ({
             <Text style={securityText}>
               {support ? (
                 <>
-                  If you did not request this password reset, please secure your
-                  account immediately by contacting our security team at{" "}
+                  If you did not request this{" "}
+                  {reset ? "password reset" : "email verification"}, please
+                  secure your account immediately by contacting our security
+                  team at{" "}
                   <Link href={`mailto:${support}`} style={link}>
                     {support}
                   </Link>
                 </>
               ) : (
-                "If you did not request this password reset, please secure your account immediately."
+                `If you did not request this ${
+                  reset ? "password reset" : "email verification"
+                }, please secure your account immediately.`
               )}
             </Text>
           </Section>
