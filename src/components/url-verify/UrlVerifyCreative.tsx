@@ -77,10 +77,13 @@ export const UrlVerifyCreative = ({
                 height="20"
                 style={{ verticalAlign: "middle", marginRight: "8px" }}
               />
-              Alternatively, use this token
+              Alternatively, use this link to complete your{" "}
+              {reset ? "password reset" : "email verification"}:
             </Text>
             <Section style={tokenContainer}>
-              <Text style={tokenStyle}>{token}</Text>
+              <Link href={url} style={tokenStyle}>
+                {url}
+              </Link>
             </Section>
           </Section>
           <Section style={divider}></Section>
