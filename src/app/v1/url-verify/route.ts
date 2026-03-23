@@ -2,6 +2,13 @@
 
 /**
  * Adding new domains requires the following updates:
+ *
+ * 1. Login to admin panel at /admin/domains
+ * 2. Add domain and API key
+ * 3. Send a test email to verify the domain
+ *
+ *
+ * DEPRECATED
  * 1. Add domain and API key to .env.local
  * 2. Include the in config/email-domains.ts
  * 3. Push to create an updated build
