@@ -11,6 +11,11 @@ let cachedDomains: Record<string, DomainConfig> | null = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 1000 * 60 * 5; // 5 minutes cache
 
+export const clearDomainCache = () => {
+  cachedDomains = null;
+  lastFetchTime = 0;
+};
+
 async function fetchAndCacheDomains() {
   const now = Date.now();
   // Return cached result if valid

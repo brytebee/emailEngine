@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDomains, addOrUpdateDomain } from "@/lib/googleSheetsDomains";
+import { clearDomainCache } from "@/config/email-domains";
 import { encrypt } from "@/lib/encryption";
 import { verifyAdmin } from "@/lib/auth";
 
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
 
     const encryptedKey = encrypt(apiKey);
     await addOrUpdateDomain(domain, encryptedKey);
+    clearDomainCache();
 
     return NextResponse.json({ success: true });
   } catch (error) {

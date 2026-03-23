@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteDomain } from "@/lib/googleSheetsDomains";
+import { clearDomainCache } from "@/config/email-domains";
 import { verifyAdmin } from "@/lib/auth";
 
 export async function DELETE(
@@ -18,6 +19,8 @@ export async function DELETE(
     }
 
     await deleteDomain(domain);
+    clearDomainCache();
+    
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE /api/domains/[domain] error:", error);
