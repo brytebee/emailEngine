@@ -28,8 +28,8 @@ export interface EmailServiceResponse {
 /**
  * Validates email domain configuration
  */
-export function validateDomainConfig(): EmailServiceResponse | null {
-  const allowedDomains = getAllowedDomains();
+export async function validateDomainConfig(): Promise<EmailServiceResponse | null> {
+  const allowedDomains = await getAllowedDomains();
 
   if (allowedDomains.length === 0) {
     return {
@@ -45,11 +45,11 @@ export function validateDomainConfig(): EmailServiceResponse | null {
 /**
  * Extracts and validates domain from email address
  */
-export function extractAndValidateDomain(email: string): {
+export async function extractAndValidateDomain(email: string): Promise<{
   domain: string;
   isValid: boolean;
   error?: EmailServiceResponse;
-} {
+}> {
   const domain = email.split("@")[1];
 
   if (!domain) {
@@ -64,7 +64,8 @@ export function extractAndValidateDomain(email: string): {
     };
   }
 
-  if (!isValidDomain(domain)) {
+  const isConfigValid = await isValidDomain(domain);
+  if (!isConfigValid) {
     return {
       domain,
       isValid: false,
@@ -112,8 +113,8 @@ export function parseRecipients(to: string | string[]): {
 /**
  * Creates a Resend instance for the given domain
  */
-export function createResendClient(domain: string): Resend | null {
-  const domainConfig = getDomainConfig(domain);
+export async function createResendClient(domain: string): Promise<Resend | null> {
+  const domainConfig = await getDomainConfig(domain);
 
   if (!domainConfig || !domainConfig.apiKey) {
     return null;
@@ -137,7 +138,7 @@ export async function sendEmail<T extends Record<string, any>>({
   getTemplateProps: (data: BaseEmailData & T) => Record<string, any>;
 }): Promise<NextResponse> {
   // Validate domain configuration
-  const configError = validateDomainConfig();
+  const configError = await validateDomainConfig();
   if (configError) {
     return NextResponse.json(configError);
   }
@@ -145,13 +146,13 @@ export async function sendEmail<T extends Record<string, any>>({
   const { from, to, subject, product, template = "default" } = emailData;
 
   // Extract and validate domain
-  const { domain, isValid, error } = extractAndValidateDomain(from);
+  const { domain, isValid, error } = await extractAndValidateDomain(from);
   if (!isValid || error) {
     return NextResponse.json(error!);
   }
 
   // Create Resend client
-  const resend = createResendClient(domain);
+  const resend = await createResendClient(domain);
   if (!resend) {
     return NextResponse.json({
       status: 500,
