@@ -1,159 +1,174 @@
-// components/notification/ModernNotification.tsx
-
 import {
-  Body,
   Button,
   Container,
-  Head,
   Heading,
-  Html,
+  Hr,
   Img,
+  Link,
   Section,
   Text,
 } from "@react-email/components";
 import * as React from "react";
-import { getEmailLogoUrl } from "@/utils/imageUtils";
+import PremiumEmailLayout from "../email-templates/PremiumEmailLayout";
 
-interface Props {
-  message?: string;
+interface WelcomeEmailProps {
   firstName?: string;
-  product?: string;
+  companyName?: string;
   logoUrl?: string;
   actionUrl?: string;
-  actionText?: string;
 }
 
 export const ModernNotificationEmail = ({
-  message = "You have a new notification",
   firstName = "there",
-  product = "Our App",
+  companyName = "EmailEngine",
   logoUrl,
-  actionUrl,
-  actionText = "View Details",
-}: Props) => (
-  <Html>
-    <Head />
-    <Body style={main}>
-      <Container style={container}>
-        {/* Logo Section */}
-        <Section style={logoSection}>
-          <Img
-            src={getEmailLogoUrl(logoUrl, product)}
-            width="60"
-            height="60"
-            alt={product}
-            style={logo}
-          />
-        </Section>
-
-        {/* Content Section */}
-        <Section style={content}>
-          <Heading style={heading}>Hi {firstName}! 👋</Heading>
-
-          <Section style={messageCard}>
-            <Text style={messageText}>{message}</Text>
-          </Section>
-
-          {actionUrl && (
+  actionUrl = "https://brytebee.com/dashboard",
+}: WelcomeEmailProps) => {
+  return (
+    <PremiumEmailLayout
+      previewText={`Welcome to ${companyName}, ${firstName}!`}
+      companyName={companyName}
+      logoUrl={logoUrl}
+    >
+      <Section style={mainContent}>
+        {/* Hero Background Area */}
+        <Section style={heroSection}>
+            <Heading style={heading}>Welcome {firstName}!</Heading>
+            <Text style={paragraph}>
+                We're excited to have you on board! Get started with the platform by following the steps below.
+            </Text>
             <Section style={buttonContainer}>
-              <Button style={button} href={actionUrl}>
-                {actionText}
-              </Button>
+                <Button style={button} href={actionUrl}>
+                    Get Started
+                </Button>
             </Section>
-          )}
         </Section>
 
-        {/* Footer */}
-        <Text style={footer}>
-          © {new Date().getFullYear()} {product}. All rights reserved.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-);
+        {/* Quick Start Grid */}
+        <Section style={quickStartSection}>
+          <Text style={label}>Quick Start</Text>
+          
+          {/* Grid Row */}
+          <table cellPadding="0" cellSpacing="0" border={0} style={{ width: "100%" }}>
+            <tr>
+              <td style={gridItem}>
+                <Section style={featureCard}>
+                  <img src="https://img.icons8.com/material-outlined/48/00D2B4/book.png" width="32" height="32" alt="icon" style={featureIcon} />
+                  <Text style={featureTitle}>Learn the Basics</Text>
+                  <Text style={featureText}>Get familiar with the essential features.</Text>
+                </Section>
+              </td>
+              <td style={gridItem}>
+                <Section style={featureCard}>
+                   <img src="https://img.icons8.com/material-outlined/48/00D2B4/rocket.png" width="32" height="32" alt="icon" style={featureIcon} />
+                   <Text style={featureTitle}>Set Up Account</Text>
+                   <Text style={featureText}>Customize your organization's workspace.</Text>
+                </Section>
+              </td>
+              <td style={gridItem}>
+                <Section style={featureCard}>
+                   <img src="https://img.icons8.com/material-outlined/48/00D2B4/customer-support.png" width="32" height="32" alt="icon" style={featureIcon} />
+                   <Text style={featureTitle}>Get Help & Support</Text>
+                   <Text style={featureText}>Reach out to our support team anytime.</Text>
+                </Section>
+              </td>
+            </tr>
+          </table>
+        </Section>
+      </Section>
+    </PremiumEmailLayout>
+  );
+};
 
 export default ModernNotificationEmail;
 
-// Styles
-const main = {
-  backgroundColor: "#f6f9fc",
-  fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
-  padding: "20px 0",
-};
-
-const container = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  maxWidth: "600px",
-  borderRadius: "12px",
-  overflow: "hidden",
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-};
-
-const logoSection = {
-  padding: "40px 40px 0",
+const mainContent = {
   textAlign: "center" as const,
 };
 
-const logo = {
-  width: "60px",
-  height: "60px",
-  borderRadius: "12px",
-  objectFit: "cover" as const,
-};
-
-const content = {
-  padding: "0 40px 40px",
+const heroSection = {
+  // mesh gradient simulated via background image or style if supported
+  background: "linear-gradient(135deg, #F8FAFF 0%, #FFFFFF 100%)",
+  padding: "0 0 48px",
 };
 
 const heading = {
-  fontSize: "24px",
-  fontWeight: "600",
-  color: "#1f2937",
-  margin: "30px 0 20px",
-  textAlign: "center" as const,
+  fontSize: "36px",
+  fontWeight: "800",
+  lineHeight: "1.2",
+  color: "#1E293B",
+  margin: "0 0 16px",
 };
 
-const messageCard = {
-  backgroundColor: "#f9fafb",
-  borderLeft: "4px solid #3b82f6",
-  borderRadius: "8px",
-  padding: "24px",
-  margin: "20px 0",
-};
-
-const messageText = {
+const paragraph = {
   fontSize: "16px",
-  lineHeight: "24px",
-  color: "#374151",
-  margin: "0",
-  fontWeight: "500",
+  lineHeight: "1.6",
+  color: "#64748B",
+  margin: "0 auto 32px",
+  maxWidth: "400px",
 };
 
 const buttonContainer = {
-  textAlign: "center" as const,
-  margin: "30px 0 20px",
+  margin: "0 0 48px",
 };
 
 const button = {
-  backgroundColor: "#3b82f6",
-  borderRadius: "8px",
-  color: "#ffffff",
-  fontSize: "16px",
-  fontWeight: "600",
+  background: "linear-gradient(135deg, #00D2B4 0%, #0069FF 100%)",
+  borderRadius: "12px",
+  color: "#FFFFFF",
+  fontSize: "18px",
+  fontWeight: "700",
   textDecoration: "none",
   textAlign: "center" as const,
   display: "inline-block",
-  padding: "14px 32px",
-  border: "none",
-  cursor: "pointer",
+  padding: "16px 40px",
+  boxShadow: "0 10px 20px rgba(0, 105, 255, 0.2)",
 };
 
-const footer = {
-  color: "#6b7280",
-  fontSize: "12px",
+const quickStartSection = {
   textAlign: "center" as const,
-  margin: "30px 0 0",
-  padding: "0 40px 30px",
+  padding: "40px 0 0",
+};
+
+const label = {
+  fontSize: "12px",
+  fontWeight: "700",
+  color: "#94A3B8",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.08em",
+  margin: "0 0 24px",
+};
+
+const gridItem = {
+    width: "33.33%",
+    padding: "0 6px",
+    verticalAlign: "top",
+};
+
+const featureCard = {
+  backgroundColor: "#FFFFFF",
+  borderRadius: "16px",
+  border: "1px solid #F1F5F9",
+  padding: "24px 16px",
+  textAlign: "center" as const,
+  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.02)",
+};
+
+const featureIcon = {
+  display: "block",
+  margin: "0 auto 16px",
+};
+
+const featureTitle = {
+  fontSize: "14px",
+  fontWeight: "800",
+  color: "#1E293B",
+  margin: "0 0 8px",
+};
+
+const featureText = {
+  fontSize: "12px",
+  lineHeight: "1.5",
+  color: "#94A3B8",
+  margin: "0",
 };

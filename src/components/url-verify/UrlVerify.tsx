@@ -1,208 +1,204 @@
-// components/url-verify/UrlVerify.tsx
-
 import {
-  Body,
+  Button,
   Container,
-  Head,
   Heading,
-  Html,
+  Hr,
   Img,
   Link,
   Section,
   Text,
 } from "@react-email/components";
 import * as React from "react";
-import { getEmailLogoUrl } from "@/utils/imageUtils";
+import PremiumEmailLayout from "../email-templates/PremiumEmailLayout";
 
-interface Props {
+interface UrlVerifyEmailProps {
   token?: string;
   url?: string;
   firstName?: string;
-  product?: string;
+  companyName?: string;
   logoUrl?: string;
-  support?: string;
   reset?: boolean;
 }
 
 export const UrlVerifyEmail = ({
   token,
   url,
-  firstName,
-  product,
+  firstName = "there",
+  companyName = "EmailEngine",
   logoUrl,
-  support,
-  reset,
-}: Props) => (
-  <Html>
-    <Head />
-    <Body style={main}>
-      <Container style={container}>
-        <Img
-          src={getEmailLogoUrl(logoUrl, product)}
-          width="120"
-          height="120"
-          alt={product || "Company Logo"}
-          style={logo}
-        />
-        <Text style={greeting}>Hi, {firstName}</Text>
-        <Text style={tertiary}>
-          {reset ? "Reset Your Password" : "Verify Your Email"}
-        </Text>
-        <Heading style={secondary}>
-          {reset
-            ? "Click the button below to reset your password."
-            : "Click the button below to verify your email."}
-        </Heading>
+  reset = false,
+}: UrlVerifyEmailProps) => {
+  const title = reset ? "Reset Your Password" : "Verify Your Email";
+  const subtext = reset
+    ? "Please confirm your identity to secure your account."
+    : "Please confirm your email address to secure your account.";
+  const buttonText = reset ? "Reset Password" : "Verify Account";
+
+  return (
+    <PremiumEmailLayout
+      previewText={`${title} - ${companyName}`}
+      companyName={companyName}
+      logoUrl={logoUrl}
+    >
+      <Section style={mainContent}>
+        <Heading style={heading}>{title}</Heading>
+        <Text style={paragraph}>{subtext}</Text>
+
         <Section style={buttonContainer}>
-          <Link href={url || ""} style={buttonStyle}>
-            {reset ? "Reset Password" : "Verify Email"}
-          </Link>
+          <Button style={button} href={url}>
+            {buttonText}
+          </Button>
         </Section>
-        <Text style={tokenText}>
-          Or use this token: <Link style={link}>{token}</Link>
-        </Text>
-        <Text style={paragraph}>Not expecting this email?</Text>
-        <Text style={paragraph}>
-          {support && "Contact "}
-          <Link href={`mailto:${support}`} style={link}>
-            {support && support}
-          </Link>{" "}
-          {!support && "Please delete and ignore "}if you did not request this
-          {reset ? "password reset." : "email verification."}
-        </Text>
-      </Container>
-      <Text style={footer}>Securely powered by {product}.</Text>
-    </Body>
-  </Html>
-);
+
+        <Hr style={hr} />
+
+        <Section style={protectionSection}>
+          <Text style={protectionLabel}>Account Protection</Text>
+          <Section style={protectionGrid}>
+            <Section style={protectionCard}>
+              <div style={iconBox}>
+                  <img src="https://img.icons8.com/material-outlined/24/00D2B4/checked-2.png" width="20" height="20" alt="icon" style={featureIcon} />
+              </div>
+              <Text style={featureTitle}>Secure Your Data</Text>
+              <Text style={featureText}>Keep your information safe.</Text>
+            </Section>
+            <Section style={protectionCard}>
+              <div style={iconBox}>
+                  <img src="https://img.icons8.com/material-outlined/24/00D2B4/checked-2.png" width="20" height="20" alt="icon" style={featureIcon} />
+              </div>
+              <Text style={featureTitle}>Prevent Unauthorized Access</Text>
+              <Text style={featureText}>Protect your account from threats.</Text>
+            </Section>
+          </Section>
+        </Section>
+
+        {token && (
+          <Text style={tokenSubtext}>
+             Or use this verification code: <br/>
+             <strong style={tokenCode}>{token}</strong>
+          </Text>
+        )}
+      </Section>
+    </PremiumEmailLayout>
+  );
+};
 
 export default UrlVerifyEmail;
 
-const main = {
-  backgroundColor: "#ffffff",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  marginTop: "30px",
-};
-
-const container = {
-  backgroundColor: "#ffffff",
-  border: "1px solid #eee",
-  borderRadius: "15px",
-  boxShadow: "0 5px 10px rgba(20,50,70,.2)",
-  marginTop: "20px",
-  maxWidth: "360px",
-  margin: "0 auto",
-  padding: "36px 0 98px",
-};
-
-const logo = {
-  margin: "30px auto",
-  borderRadius: "50%",
-  width: "120px",
-  height: "120px",
-  objectFit: "cover" as const,
-};
-
-const greeting = {
-  color: "#444",
-  fontSize: "15px",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  letterSpacing: "0",
-  lineHeight: "23px",
-  padding: "12px 40px",
-  margin: "0",
-  textAlign: "left" as const,
-  fontWeight: "900",
-};
-
-const tertiary = {
-  color: "#0a85ea",
-  fontSize: "11px",
-  fontWeight: 700,
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  height: "16px",
-  letterSpacing: "0",
-  lineHeight: "16px",
-  margin: "16px 8px 8px 8px",
-  textTransform: "uppercase" as const,
+const mainContent = {
   textAlign: "center" as const,
 };
 
-const secondary = {
-  color: "#000",
-  display: "inline-block",
-  fontFamily: "HelveticaNeue-Medium,Helvetica,Arial,sans-serif",
-  fontSize: "18px",
-  fontWeight: 500,
-  lineHeight: "24px",
-  marginBottom: "0",
-  marginTop: "0",
-  textAlign: "center" as const,
-  padding: "0 30px",
-};
-
-const buttonContainer = {
-  margin: "26px auto 14px",
-  textAlign: "center" as const,
-};
-
-const buttonStyle = {
-  backgroundColor: "#0a85ea",
-  borderRadius: "4px",
-  color: "#fff",
-  display: "inline-block",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  fontSize: "15px",
-  fontWeight: 500,
-  lineHeight: "50px",
-  textAlign: "center" as const,
-  textDecoration: "none",
-  width: "180px",
-};
-
-const tokenText = {
-  color: "#444",
-  fontSize: "15px",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  letterSpacing: "0",
-  lineHeight: "23px",
-  padding: "10px 40px",
-  margin: "0",
-  textAlign: "center" as const,
-  marginBottom: "20px",
-};
-
-const tokenStyle = {
-  fontWeight: 700,
-  letterSpacing: "2px",
+const heading = {
+  fontSize: "32px",
+  fontWeight: "800",
+  lineHeight: "1.2",
+  color: "#1E293B",
+  margin: "0 0 16px",
 };
 
 const paragraph = {
-  color: "#444",
-  fontSize: "15px",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  letterSpacing: "0",
-  lineHeight: "23px",
-  padding: "0 40px",
-  margin: "0",
+  fontSize: "16px",
+  lineHeight: "1.6",
+  color: "#64748B",
+  margin: "0 0 40px",
+};
+
+const buttonContainer = {
+  margin: "0 0 48px",
+};
+
+const button = {
+  background: "linear-gradient(135deg, #00D2B4 0%, #0069FF 100%)",
+  borderRadius: "100px",
+  color: "#FFFFFF",
+  fontSize: "18px",
+  fontWeight: "700",
+  textDecoration: "none",
   textAlign: "center" as const,
-  marginBottom: "20px",
+  display: "inline-block",
+  padding: "18px 48px",
+  boxShadow: "0 10px 20px rgba(0, 105, 255, 0.2)",
 };
 
-const link = {
-  color: "#444",
-  textDecoration: "underline",
+const hr = {
+  borderTop: "1px solid #E2E8F0",
+  margin: "0 0 40px",
 };
 
-const footer = {
-  color: "#000",
+const protectionSection = {
+  textAlign: "center" as const,
+};
+
+const protectionLabel = {
   fontSize: "12px",
-  fontWeight: 800,
-  letterSpacing: "0",
-  lineHeight: "23px",
-  margin: "0",
-  marginTop: "20px",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  textAlign: "center" as const,
+  fontWeight: "700",
+  color: "#94A3B8",
   textTransform: "uppercase" as const,
+  letterSpacing: "0.05em",
+  margin: "0 0 24px",
+  backgroundColor: "#FFFFFF",
+  display: "inline-block",
+  padding: "0 16px",
+  position: "relative" as const,
+  zIndex: 1,
+};
+
+const protectionGrid = {
+  display: "flex",
+  gap: "12px",
+  justifyContent: "center",
+};
+
+const protectionCard = {
+  width: "48%",
+  backgroundColor: "#FFFFFF",
+  borderRadius: "12px",
+  border: "1px solid #F1F5F9",
+  padding: "24px 16px",
+  textAlign: "center" as const,
+  display: "inline-block",
+  margin: "0 6px",
+};
+
+const iconBox = {
+  width: "32px",
+  height: "32px",
+  backgroundColor: "#F0FDFA",
+  borderRadius: "8px",
+  margin: "0 auto 12px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: "1px solid #CCFBF1",
+};
+
+const featureIcon = {
+  display: "block",
+  margin: "6px auto",
+};
+
+const featureTitle = {
+  fontSize: "14px",
+  fontWeight: "700",
+  color: "#1E293B",
+  margin: "0 0 4px",
+};
+
+const featureText = {
+  fontSize: "12px",
+  color: "#94A3B8",
+  margin: "0",
+};
+
+const tokenSubtext = {
+  fontSize: "14px",
+  color: "#94A3B8",
+  margin: "40px 0 0",
+};
+
+const tokenCode = {
+  color: "#0069FF",
+  fontSize: "24px",
+  letterSpacing: "0.1em",
 };

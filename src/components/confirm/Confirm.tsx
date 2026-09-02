@@ -1,182 +1,108 @@
-// components/confirm/Confirm.tsx
-
 import {
-  Body,
   Container,
-  Head,
   Heading,
-  Html,
+  Hr,
   Img,
   Link,
   Section,
   Text,
 } from "@react-email/components";
 import * as React from "react";
-import { getEmailLogoUrl } from "@/utils/imageUtils";
+import PremiumEmailLayout from "../email-templates/PremiumEmailLayout";
 
-interface Props {
+interface ConfirmEmailProps {
   code?: string;
   firstName?: string;
-  product?: string;
-  support?: string;
+  companyName?: string;
   logoUrl?: string;
 }
 
 export const ConfirmEmail = ({
-  code,
-  firstName,
-  product,
+  code = "000 000",
+  firstName = "there",
+  companyName = "EmailEngine",
   logoUrl,
-  support,
-}: Props) => (
-  <Html>
-    <Head />
-    <Body style={main}>
-      <Container style={container}>
-        <Img
-          src={getEmailLogoUrl(logoUrl, product)}
-          width="120"
-          height="120"
-          alt={product || "Company Logo"}
-          style={logo}
-        />
-        <Text style={greeting}>Hi, {firstName}</Text>
-        <Text style={tertiary}>Verify Your Identity</Text>
-        <Heading style={secondary}>
-          Enter the following code to complete your account creation.
-        </Heading>
-        <Section style={codeContainer}>
-          <Text style={codeStyle}>{code}</Text>
+}: ConfirmEmailProps) => {
+  return (
+    <PremiumEmailLayout
+      previewText={`Your ${companyName} verification code: ${code}`}
+      companyName={companyName}
+      logoUrl={logoUrl}
+    >
+      <Section style={mainContent}>
+        <Heading style={heading}>Your Security Code</Heading>
+        
+        {/* The OTP Code Box */}
+        <Section style={codeBox}>
+          <Text style={codeText}>{code}</Text>
         </Section>
-        <Text style={paragraph}>Not expecting this email?</Text>
-        <Text style={paragraph}>
-          {support && "Contact "}
-          <Link href={`mailto:${support}`} style={link}>
-            {support && support}
-          </Link>{" "}
-          {!support && "Please delete and ignore "}if you did not request this
-          code.
-        </Text>
-      </Container>
-      <Text style={footer}>Securely powered by {product}.</Text>
-    </Body>
-  </Html>
-);
+
+        <Hr style={hr} />
+
+        {/* Security Warning Section */}
+        <Section style={securitySection}>
+            <div style={iconBox}>
+                <img src="https://img.icons8.com/material-outlined/24/94A3B8/security-shield.png" width="24" height="24" alt="shield" />
+            </div>
+            <Text style={securityText}>
+                Do not share this code with anyone.
+            </Text>
+        </Section>
+      </Section>
+    </PremiumEmailLayout>
+  );
+};
 
 export default ConfirmEmail;
 
-const main = {
-  backgroundColor: "#ffffff",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  marginTop: "30px",
+const mainContent = {
+  textAlign: "center" as const,
+  padding: "20px 0",
 };
 
-const container = {
-  backgroundColor: "#ffffff",
-  border: "1px solid #eee",
-  borderRadius: "15px",
-  boxShadow: "0 5px 10px rgba(20,50,70,.2)",
-  marginTop: "20px",
+const heading = {
+  fontSize: "28px",
+  fontWeight: "600",
+  lineHeight: "1.3",
+  color: "#1E293B",
+  margin: "0 0 48px",
+};
+
+const codeBox = {
+  backgroundColor: "#EEF2FF",
+  borderRadius: "24px",
+  padding: "40px 20px",
+  margin: "0 auto 48px",
   maxWidth: "360px",
-  margin: "0 auto",
-  padding: "36px 0 98px",
+  textAlign: "center" as const,
 };
 
-const logo = {
-  margin: "30px auto",
-  borderRadius: "50%",
-  width: "120px",
-  height: "120px",
-  objectFit: "cover" as const,
-};
-
-const greeting = {
-  color: "#444",
-  fontSize: "15px",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  letterSpacing: "0",
-  lineHeight: "23px",
-  padding: "12px 40px",
+const codeText = {
+  fontSize: "48px",
+  fontWeight: "400",
+  letterSpacing: "0.15em",
+  color: "#1E293B",
   margin: "0",
-  textAlign: "left" as const,
-  fontWeight: "900",
+  fontFamily: "'Courier New', Courier, monospace",
 };
 
-const tertiary = {
-  color: "#0a85ea",
-  fontSize: "11px",
-  fontWeight: 700,
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  height: "16px",
-  letterSpacing: "0",
-  lineHeight: "16px",
-  margin: "16px 8px 8px 8px",
-  textTransform: "uppercase" as const,
-  textAlign: "center" as const,
+const hr = {
+  borderTop: "1px solid #F1F5F9",
+  margin: "0 0 32px",
 };
 
-const secondary = {
-  color: "#000",
-  display: "inline-block",
-  fontFamily: "HelveticaNeue-Medium,Helvetica,Arial,sans-serif",
-  fontSize: "18px",
-  fontWeight: 500,
-  lineHeight: "24px",
-  marginBottom: "0",
-  marginTop: "0",
-  textAlign: "center" as const,
-  padding: "0 30px",
+const securitySection = {
+    textAlign: "center" as const,
 };
 
-const codeContainer = {
-  background: "rgba(0,0,0,.05)",
-  borderRadius: "4px",
-  margin: "16px auto 14px",
-  verticalAlign: "middle",
-  width: "280px",
+const iconBox = {
+    width: "32px",
+    height: "32px",
+    margin: "0 auto 12px",
 };
 
-const codeStyle = {
-  color: "#000",
-  display: "inline-block",
-  fontFamily: "HelveticaNeue-Bold",
-  fontSize: "32px",
-  fontWeight: 700,
-  letterSpacing: "6px",
-  lineHeight: "40px",
-  paddingBottom: "8px",
-  paddingTop: "8px",
-  margin: "0 auto",
-  width: "100%",
-  textAlign: "center" as const,
-};
-
-const paragraph = {
-  color: "#444",
-  fontSize: "15px",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  letterSpacing: "0",
-  lineHeight: "23px",
-  padding: "0 40px",
+const securityText = {
+  fontSize: "14px",
+  color: "#94A3B8",
   margin: "0",
-  textAlign: "center" as const,
-  marginBottom: "20px",
-};
-
-const link = {
-  color: "#444",
-  textDecoration: "underline",
-};
-
-const footer = {
-  color: "#000",
-  fontSize: "12px",
-  fontWeight: 800,
-  letterSpacing: "0",
-  lineHeight: "23px",
-  margin: "0",
-  marginTop: "20px",
-  fontFamily: "HelveticaNeue,Helvetica,Arial,sans-serif",
-  textAlign: "center" as const,
-  textTransform: "uppercase" as const,
 };
