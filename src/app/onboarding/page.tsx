@@ -33,7 +33,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-export default function OnboardingPage() {
+function OnboardingPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialPlan = searchParams.get("plan") || "silver";
@@ -569,5 +569,13 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <OnboardingPageInner />
+    </React.Suspense>
   );
 }

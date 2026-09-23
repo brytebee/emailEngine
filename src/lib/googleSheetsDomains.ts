@@ -291,6 +291,15 @@ export const setAuthRecord = async (record: AuthRecord): Promise<void> => {
   }
 };
 
+export const deleteAuthRecord = async (username: string): Promise<void> => {
+  const { authSheet } = await initializeGoogleSheet();
+  const rows = await authSheet.getRows();
+  const row = rows.find((r) => r.get("Username") === username);
+  if (row) {
+    await row.delete();
+  }
+};
+
 // --- NEW MULTI-TENANT ENTITIES ---
 
 // Organizations

@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function VerifyPaymentPage() {
+function VerifyPaymentPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
@@ -142,5 +142,13 @@ export default function VerifyPaymentPage() {
          )}
       </Card>
     </div>
+  );
+}
+
+export default function VerifyPaymentPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <VerifyPaymentPageInner />
+    </React.Suspense>
   );
 }

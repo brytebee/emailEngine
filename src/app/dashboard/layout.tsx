@@ -22,7 +22,7 @@ import { useSession, signOut } from "next-auth/react";
 
 type AuthState = "checking" | "authorized" | "redirecting";
 
-export default function DashboardLayout({
+function DashboardLayoutInner({
   children,
 }: {
   children: React.ReactNode;
@@ -282,5 +282,17 @@ export default function DashboardLayout({
         </main>
       </div>
     </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <React.Suspense fallback={null}>
+      <DashboardLayoutInner>{children}</DashboardLayoutInner>
+    </React.Suspense>
   );
 }
